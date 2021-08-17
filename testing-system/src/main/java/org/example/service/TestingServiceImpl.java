@@ -1,6 +1,7 @@
 package org.example.service;
 
 import org.example.domain.Quiz;
+import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -9,8 +10,8 @@ import java.util.Scanner;
 
 public class TestingServiceImpl implements TestingService {
     private final QuizService quizService;
+    private final PrintStream out;
 
-    private PrintStream out;
     private Scanner scanner;
 
     private String firstName;

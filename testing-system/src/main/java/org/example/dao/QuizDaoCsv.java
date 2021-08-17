@@ -1,6 +1,8 @@
 package org.example.dao;
 
 import org.example.domain.Quiz;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.net.URI;
@@ -11,15 +13,17 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+@Repository("quizDao")
 public class QuizDaoCsv implements QuizDao {
     private static final int QUESTION_POSITION = 0;
     private final URI uri;
     private List<Quiz> quizzes;
 
-    public QuizDaoCsv(String path) {
+    public QuizDaoCsv(@Value("${quiz.path}") String path) {
         URL resource = getClass().getClassLoader().getResource(path);
         if (resource == null) {
             throw new IllegalArgumentException("Quizzes file path not found");
@@ -60,10 +64,7 @@ public class QuizDaoCsv implements QuizDao {
             String[] split = line.split("\\s*,\\s*");
             String question = split[QUESTION_POSITION];
             int answer = Integer.parseInt(split[split.length - 1]);
-            List<String> answers = new ArrayList<>();
-            for (int i = 1; i < split.length - 1; i++) {
-                answers.add(split[i]);
-            }
+            List<String> answers = new ArrayList<>(Arrays.asList(split).subList(1, split.length - 1));
             quizzes.add(new Quiz(question, answers, Collections.singleton(answer)));
         }
     }

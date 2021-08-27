@@ -23,7 +23,7 @@ public class QuizDaoCsv implements QuizDao {
     private final URI uri;
     private List<Quiz> quizzes;
 
-    public QuizDaoCsv(@Value("${quiz.path}") String path) {
+    public QuizDaoCsv(@Value("${application.quiz.path}") String path) {
         URL resource = getClass().getClassLoader().getResource(path);
         if (resource == null) {
             throw new IllegalArgumentException("Quizzes file path not found");

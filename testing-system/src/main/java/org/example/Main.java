@@ -1,21 +1,18 @@
 package org.example;
 
 import org.example.service.TestingService;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
-@ComponentScan
-@Configuration
-@PropertySource("classpath:application.properties")
+@SpringBootApplication
 public class Main {
     public static void main(String[] args) {
-        AnnotationConfigApplicationContext context =
-                new AnnotationConfigApplicationContext(Main.class);
+        ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
         TestingService testingService = context.getBean(TestingService.class);
         testingService.start();
         testingService.test();
         testingService.printStats();
+        context.stop();
     }
 }

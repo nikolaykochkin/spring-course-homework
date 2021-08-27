@@ -1,16 +1,19 @@
 package org.example.service;
 
 import org.example.domain.Quiz;
-import org.springframework.stereotype.Service;
+import org.springframework.context.MessageSource;
 
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class TestingServiceImpl implements TestingService {
     private final QuizService quizService;
     private final PrintStream out;
+    private final MessageSource messageSource;
+    private final Locale locale;
 
     private Scanner scanner;
 
@@ -20,19 +23,21 @@ public class TestingServiceImpl implements TestingService {
     private int totalQuestions;
     private int correctAnswers;
 
-    public TestingServiceImpl(QuizService quizService, InputStream in, PrintStream out) {
+    public TestingServiceImpl(QuizService quizService, InputStream in, PrintStream out, MessageSource messageSource, Locale locale) {
         this.quizService = quizService;
         this.out = out;
+        this.messageSource = messageSource;
+        this.locale = locale;
         setupScanner(in);
     }
 
     @Override
     public void start() {
-        out.println("Please enter your first name:");
+        out.println(messageSource.getMessage("testing.first_name", new String[]{}, locale));
         firstName = scanner.nextLine();
-        out.println("Please enter your second name:");
+        out.println(messageSource.getMessage("testing.second_name", new String[]{}, locale));
         secondName = scanner.nextLine();
-        out.printf("Hello %s %s!%n", firstName, secondName);
+        out.println(messageSource.getMessage("testing.hello", new String[]{firstName, secondName}, locale));
     }
 
     @Override
@@ -46,16 +51,18 @@ public class TestingServiceImpl implements TestingService {
                 out.printf("%d. %s%n", counter++, answer);
             }
             counter--;
-            out.printf("Please enter your answer [1-%d]%n", counter);
+            out.println(messageSource.getMessage("testing.answer.enter",
+                    new String[]{String.valueOf(counter)}, locale));
             int answer = 0;
             while (answer < 1 || answer > counter) {
                 try {
                     answer = Integer.parseInt(scanner.nextLine());
                     if (answer < 1 || answer > counter) {
-                        out.printf("Your answer is less than 1 or greater than %d, please enter your answer again%n", counter);
+                        out.println(messageSource.getMessage("testing.answer.error.unbound",
+                                new String[]{String.valueOf(counter)}, locale));
                     }
                 } catch (NumberFormatException e) {
-                    out.println("Your answer is not a number, please enter your answer again");
+                    out.println(messageSource.getMessage("testing.answer.error.nan", new String[]{}, locale));
                 }
             }
             totalQuestions++;
@@ -65,7 +72,8 @@ public class TestingServiceImpl implements TestingService {
 
     @Override
     public void printStats() {
-        out.printf("%s %s your result is %d correct answers from %d%n", firstName, secondName, correctAnswers, totalQuestions);
+        String[] args = {firstName, secondName, String.valueOf(correctAnswers), String.valueOf(totalQuestions)};
+        out.println(messageSource.getMessage("testing.stats", args, locale));
     }
 
     public void setFirstName(String firstName) {

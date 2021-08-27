@@ -1,0 +1,4 @@
+application:
+  locale: en
+  quiz:
+    path: quizzes.csv

@@ -6,4 +6,8 @@ public interface TestingService {
     void test();
 
     void printStats();
+
+    boolean testAvailable();
+
+    boolean resultAvailable();
 }

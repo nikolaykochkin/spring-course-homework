@@ -23,6 +23,9 @@ public class TestingServiceImpl implements TestingService {
     private int totalQuestions;
     private int correctAnswers;
 
+    private boolean testAvailable;
+    private boolean resultAvailable;
+
     public TestingServiceImpl(QuizService quizService, InputStream in, PrintStream out, MessageSource messageSource, Locale locale) {
         this.quizService = quizService;
         this.out = out;
@@ -38,6 +41,9 @@ public class TestingServiceImpl implements TestingService {
         out.println(messageSource.getMessage("testing.second_name", new String[]{}, locale));
         secondName = scanner.nextLine();
         out.println(messageSource.getMessage("testing.hello", new String[]{firstName, secondName}, locale));
+
+        testAvailable = true;
+        resultAvailable = false;
     }
 
     @Override
@@ -68,12 +74,26 @@ public class TestingServiceImpl implements TestingService {
             totalQuestions++;
             correctAnswers += quizService.checkAnswer(quiz, answer) ? 1 : 0;
         }
+        testAvailable = false;
+        resultAvailable = true;
     }
 
     @Override
     public void printStats() {
         String[] args = {firstName, secondName, String.valueOf(correctAnswers), String.valueOf(totalQuestions)};
         out.println(messageSource.getMessage("testing.stats", args, locale));
+        testAvailable = false;
+        resultAvailable = false;
+    }
+
+    @Override
+    public boolean testAvailable() {
+        return testAvailable;
+    }
+
+    @Override
+    public boolean resultAvailable() {
+        return resultAvailable;
     }
 
     public void setFirstName(String firstName) {

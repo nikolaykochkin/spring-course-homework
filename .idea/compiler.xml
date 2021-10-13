@@ -7,14 +7,17 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="testing-system" />
+        <module name="library" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="library" target="11" />
       <module name="testing-system" target="11" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="library" options="-parameters" />
       <module name="testing-system" options="-parameters" />
     </option>
   </component>

@@ -1,6 +1,10 @@
 package org.example.dao;
 
+import org.example.exception.LibraryDataAccessException;
 import org.example.model.Author;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -10,9 +14,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class AuthorDaoJdbc implements AuthorDao {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthorDaoJdbc.class);
     private static final RowMapper<Author> mapper = ((rs, rowNum) ->
             new Author(rs.getLong("id"), rs.getString("name")));
 
@@ -24,32 +30,66 @@ public class AuthorDaoJdbc implements AuthorDao {
 
     @Override
     public Author getById(long id) {
-        return jdbc.queryForObject("select id, name from authors where id = :id", Map.of("id", id), mapper);
+        Author author;
+        try {
+            author = jdbc.queryForObject("select id, name from authors where id = :id", Map.of("id", id), mapper);
+        } catch (DataAccessException e) {
+            LOGGER.error("Can't find author by id `{}`, cause: `{}`", id, e.getMessage());
+            throw new LibraryDataAccessException(e.getMessage(), e);
+        }
+        return author;
     }
 
     @Override
     public List<Author> getAll() {
-        return jdbc.query("select * from authors", mapper);
+        List<Author> authors;
+        try {
+            authors = jdbc.query("select * from authors", mapper);
+        } catch (DataAccessException e) {
+            LOGGER.error("Can't get all authors, cause: `{}`", e.getMessage());
+            throw new LibraryDataAccessException(e.getMessage(), e);
+        }
+        return authors;
     }
 
     @Override
     public long insert(Author author) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbc.update("insert into authors (name) values (:name)",
-                new MapSqlParameterSource("name", author.getName()), keyHolder);
-        long id = keyHolder.getKey().longValue();
+        try {
+            jdbc.update("insert into authors (name) values (:name)",
+                    new MapSqlParameterSource("name", author.getName()), keyHolder);
+        } catch (DataAccessException e) {
+            LOGGER.error("Can't insert author `{}`, cause: `{}`", author, e.getMessage());
+            throw new LibraryDataAccessException(e.getMessage(), e);
+        }
+
+        long id = Optional.ofNullable(keyHolder.getKey())
+                .map(Number::longValue)
+                .orElseThrow(() -> new LibraryDataAccessException("Failed to get author id, the keyHolder.getKey() is null"));
+
         author.setId(id);
+
         return id;
     }
 
     @Override
     public void update(Author author) {
-        jdbc.update("update authors set name = :name where id = :id",
-                Map.of("id", author.getId(), "name", author.getName()));
+        try {
+            jdbc.update("update authors set name = :name where id = :id",
+                    Map.of("id", author.getId(), "name", author.getName()));
+        } catch (DataAccessException e) {
+            LOGGER.error("Can't update author `{}`, cause: `{}`", author, e.getMessage());
+            throw new LibraryDataAccessException(e.getMessage(), e);
+        }
     }
 
     @Override
     public void deleteById(long id) {
-        jdbc.update("delete from authors where id = :id", Map.of("id", id));
+        try {
+            jdbc.update("delete from authors where id = :id", Map.of("id", id));
+        } catch (DataAccessException e) {
+            LOGGER.error("Can't delete author by id `{}`, cause: `{}`", id, e.getMessage());
+            throw new LibraryDataAccessException(e.getMessage(), e);
+        }
     }
 }

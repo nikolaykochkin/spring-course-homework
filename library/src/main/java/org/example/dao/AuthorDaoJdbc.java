@@ -43,6 +43,12 @@ public class AuthorDaoJdbc implements AuthorDao {
     }
 
     @Override
+    public void update(Author author) {
+        jdbc.update("update authors set name = :name where id = :id",
+                Map.of("id", author.getId(), "name", author.getName()));
+    }
+
+    @Override
     public void deleteById(long id) {
         jdbc.update("delete from authors where id = :id", Map.of("id", id));
     }

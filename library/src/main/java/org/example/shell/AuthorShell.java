@@ -1,48 +1,40 @@
 package org.example.shell;
 
-import org.example.dao.AuthorDao;
-import org.example.model.Author;
+import org.example.service.AuthorService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
-import java.util.Scanner;
-import java.util.stream.Collectors;
-
 @ShellComponent
 public class AuthorShell {
-    private final AuthorDao authorDao;
-    private final Scanner scanner;
+    private final AuthorService authorService;
 
-    public AuthorShell(AuthorDao authorDao) {
-        this.authorDao = authorDao;
-        this.scanner = new Scanner(System.in);
+    public AuthorShell(AuthorService authorService) {
+        this.authorService = authorService;
     }
 
-    @ShellMethod(value = "Find author by id", key = {"af", "authors find"})
+    @ShellMethod(value = "Find author by id", key = {"af", "author find"})
     public String find(@ShellOption long id) {
-        return authorDao.getById(id).toString();
+        return authorService.find(id);
     }
 
-    @ShellMethod(value = "List of authors", key = {"al", "authors list"})
+    @ShellMethod(value = "List of authors", key = {"al", "author list"})
     public String list() {
-        return authorDao.getAll().stream()
-                .map(Author::toString)
-                .collect(Collectors.joining("\n"));
+        return authorService.list();
     }
 
-    @ShellMethod(value = "Create author", key = {"ac", "authors create"})
+    @ShellMethod(value = "Create author", key = {"ac", "author create"})
     public String insert() {
-        System.out.print("Enter author name: ");
-        Author author = new Author(scanner.nextLine());
-        authorDao.insert(author);
-        return author.toString();
+        return authorService.insert();
     }
 
-    @ShellMethod(value = "Delete author", key = {"ad", "authors delete"})
+    @ShellMethod(value = "Update author by id", key = {"au", "author update"})
+    public String update(@ShellOption long id) {
+        return authorService.update(id);
+    }
+
+    @ShellMethod(value = "Delete author by id", key = {"ad", "author delete"})
     public String delete(@ShellOption long id) {
-        Author author = authorDao.getById(id);
-        authorDao.deleteById(id);
-        return "Author " + author + " deleted";
+        return authorService.delete(id);
     }
 }

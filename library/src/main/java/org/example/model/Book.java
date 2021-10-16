@@ -13,6 +13,12 @@ public class Book {
         this.genre = genre;
     }
 
+    public Book(String name, Author author, Genre genre) {
+        this.name = name;
+        this.author = author;
+        this.genre = genre;
+    }
+
     public long getId() {
         return id;
     }
@@ -43,5 +49,15 @@ public class Book {
 
     public void setGenre(Genre genre) {
         this.genre = genre;
+    }
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", author=" + author +
+                ", genre=" + genre +
+                '}';
     }
 }

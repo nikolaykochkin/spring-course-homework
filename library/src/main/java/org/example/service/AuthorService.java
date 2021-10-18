@@ -31,20 +31,9 @@ public class AuthorService {
     }
 
     public String find(long id) {
-        Optional<Author> author = getAuthor(id);
-        return author
+        return authorDao.getByIdOptional(id)
                 .map(Author::toString)
                 .orElse("Author not found!");
-    }
-
-    private Optional<Author> getAuthor(long id) {
-        Optional<Author> author = Optional.empty();
-        try {
-            author = Optional.of(authorDao.getById(id));
-        } catch (LibraryDataAccessException e) {
-            LOGGER.error("Failed to get author by id: `{}`, cause `{}`", id, e.getMessage());
-        }
-        return author;
     }
 
     public String list() {
@@ -77,7 +66,7 @@ public class AuthorService {
     }
 
     public String update(long id) {
-        Optional<Author> author = getAuthor(id);
+        Optional<Author> author = authorDao.getByIdOptional(id);
         if (author.isEmpty()) {
             return "Author not found!";
         }
@@ -98,7 +87,7 @@ public class AuthorService {
     }
 
     public String delete(long id) {
-        Optional<Author> author = getAuthor(id);
+        Optional<Author> author = authorDao.getByIdOptional(id);
         if (author.isEmpty()) {
             return "Author not found!";
         }

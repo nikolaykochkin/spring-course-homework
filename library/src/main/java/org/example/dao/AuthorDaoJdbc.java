@@ -41,6 +41,17 @@ public class AuthorDaoJdbc implements AuthorDao {
     }
 
     @Override
+    public Optional<Author> getByIdOptional(long id) {
+        Author author;
+        try {
+            author = getById(id);
+        } catch (LibraryDataAccessException e) {
+            return Optional.empty();
+        }
+        return Optional.of(author);
+    }
+
+    @Override
     public List<Author> getAll() {
         List<Author> authors;
         try {

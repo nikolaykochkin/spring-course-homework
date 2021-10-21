@@ -1,5 +1,7 @@
 package org.example.model;
 
+import java.util.Objects;
+
 public class Book {
     private long id;
     private String name;
@@ -59,5 +61,18 @@ public class Book {
                 ", author=" + author +
                 ", genre=" + genre +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Book book = (Book) o;
+        return id == book.id && name.equals(book.name) && author.equals(book.author) && genre.equals(book.genre);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, author, genre);
     }
 }

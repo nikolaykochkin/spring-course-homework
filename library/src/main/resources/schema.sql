@@ -35,5 +35,5 @@ create table comments
     text       varchar(255) not null,
     book_id    bigint,
     primary key (id),
-    foreign key (book_id) references books
+    foreign key (book_id) references books on delete cascade
 );

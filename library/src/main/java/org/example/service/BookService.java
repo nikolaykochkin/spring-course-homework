@@ -3,7 +3,6 @@ package org.example.service;
 import org.example.dao.AuthorDao;
 import org.example.dao.BookDao;
 import org.example.dao.GenreDao;
-import org.example.exception.LibraryDataAccessException;
 import org.example.model.Author;
 import org.example.model.Book;
 import org.example.model.Genre;
@@ -11,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -40,19 +41,27 @@ public class BookService {
         this.printStream = printStream;
     }
 
+    @Transactional(readOnly = true)
     public String find(long id) {
-        return bookDao.getByIdOptional(id)
+        Optional<Book> optionalBook = Optional.empty();
+        try {
+            optionalBook = bookDao.findById(id);
+        } catch (Exception e) {
+            LOGGER.error("Failed to find book by id `{}`, cause `{}`", id, e.getMessage());
+        }
+        return optionalBook
                 .map(Book::toString)
                 .orElse("Book not found!");
     }
 
+    @Transactional(readOnly = true)
     public String list() {
         Optional<String> books = Optional.empty();
         try {
-            books = Optional.of(bookDao.getAll().stream()
+            books = Optional.of(bookDao.findAll().stream()
                     .map(Book::toString)
                     .collect(Collectors.joining("\n")));
-        } catch (LibraryDataAccessException e) {
+        } catch (Exception e) {
             LOGGER.error("Failed to get authors list, cause `{}`", e.getMessage());
         }
         if (books.isPresent() && !books.get().isBlank()) {
@@ -62,31 +71,33 @@ public class BookService {
         }
     }
 
+    @Transactional
     public String insert() {
         printStream.print("Enter book name: ");
         String name = scanner.nextLine();
         printStream.print("Enter author id: ");
-        Optional<Author> author = authorDao.getByIdOptional(Long.parseLong(scanner.nextLine()));
+        Optional<Author> author = authorDao.findById(Long.parseLong(scanner.nextLine()));
         if (author.isEmpty()) {
             return "Author not found!";
         }
         printStream.print("Enter genre id: ");
-        Optional<Genre> genre = genreDao.getByIdOptional(Long.parseLong(scanner.nextLine()));
+        Optional<Genre> genre = genreDao.findById(Long.parseLong(scanner.nextLine()));
         if (genre.isEmpty()) {
             return "Genre not found!";
         }
-        Book book = new Book(name, author.get(), genre.get());
+        Book book = new Book(0, name, author.get(), genre.get(), null);
         try {
-            bookDao.insert(book);
-        } catch (LibraryDataAccessException e) {
+            bookDao.save(book);
+        } catch (Exception e) {
             LOGGER.error("Failed to save book, cause `{}`", e.getMessage());
             return "Something went wrong, the book was not saved!";
         }
         return book.toString();
     }
 
+    @Transactional
     public String update(long id) {
-        Optional<Book> book = bookDao.getByIdOptional(id);
+        Optional<Book> book = bookDao.findById(id);
         if (book.isEmpty()) {
             return "Book not found!";
         }
@@ -95,33 +106,34 @@ public class BookService {
         printStream.print("Enter new book name: ");
         book.get().setName(scanner.nextLine());
         printStream.print("Enter new author id: ");
-        Optional<Author> author = authorDao.getByIdOptional(Long.parseLong(scanner.nextLine()));
+        Optional<Author> author = authorDao.findById(Long.parseLong(scanner.nextLine()));
         if (author.isEmpty()) {
             return "Author not found!";
         }
         book.get().setAuthor(author.get());
         printStream.print("Enter new genre id: ");
-        Optional<Genre> genre = genreDao.getByIdOptional(Long.parseLong(scanner.nextLine()));
+        Optional<Genre> genre = genreDao.findById(Long.parseLong(scanner.nextLine()));
         if (genre.isEmpty()) {
             return "Genre not found!";
         }
         try {
             bookDao.update(book.get());
-        } catch (LibraryDataAccessException e) {
+        } catch (Exception e) {
             LOGGER.error("Failed to update book, cause `{}`", e.getMessage());
             return "Something went wrong, the book was not updated!";
         }
-        return bookDao.getById(id).toString();
+        return book.get().toString();
     }
 
+    @Transactional
     public String delete(long id) {
-        Optional<Book> book = bookDao.getByIdOptional(id);
+        Optional<Book> book = bookDao.findById(id);
         if (book.isEmpty()) {
             return "Book not found!";
         }
         try {
             bookDao.deleteById(id);
-        } catch (LibraryDataAccessException e) {
+        } catch (Exception e) {
             LOGGER.error("Failed to update book, cause `{}`", e.getMessage());
             return "Something went wrong, the book was not deleted!";
         }

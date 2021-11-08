@@ -1,12 +1,12 @@
 package org.example.service;
 
 import org.example.dao.GenreDao;
-import org.example.exception.LibraryDataAccessException;
 import org.example.model.Genre;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -31,7 +31,13 @@ public class GenreService {
     }
 
     public String find(long id) {
-        return genreDao.getByIdOptional(id)
+        Optional<Genre> optionalGenre = Optional.empty();
+        try {
+            optionalGenre = genreDao.findById(id);
+        } catch (Exception e) {
+            LOGGER.error("Failed to find genre by id `{}`, cause `{}`", id, e.getMessage());
+        }
+        return optionalGenre
                 .map(Genre::toString)
                 .orElse("Genre not found!");
     }
@@ -39,10 +45,10 @@ public class GenreService {
     public String list() {
         Optional<String> genres = Optional.empty();
         try {
-            genres = Optional.of(genreDao.getAll().stream()
+            genres = Optional.of(genreDao.findAll().stream()
                     .map(Genre::toString)
                     .collect(Collectors.joining("\n")));
-        } catch (LibraryDataAccessException e) {
+        } catch (Exception e) {
             LOGGER.error("Failed to get genres list, cause `{}`", e.getMessage());
         }
         if (genres.isPresent() && !genres.get().isBlank()) {
@@ -52,20 +58,23 @@ public class GenreService {
         }
     }
 
+    @Transactional
     public String insert() {
         printStream.print("Enter genre name: ");
-        Genre genre = new Genre(scanner.nextLine());
+        Genre genre = new Genre();
+        genre.setName(scanner.nextLine());
         try {
-            genreDao.insert(genre);
-        } catch (LibraryDataAccessException e) {
+            genreDao.save(genre);
+        } catch (Exception e) {
             LOGGER.error("Failed to save genre, cause `{}`", e.getMessage());
             return "Something went wrong, the genre was not saved!";
         }
         return genre.toString();
     }
 
+    @Transactional
     public String update(long id) {
-        Optional<Genre> genre = genreDao.getByIdOptional(id);
+        Optional<Genre> genre = genreDao.findById(id);
         if (genre.isEmpty()) {
             return "Genre not found!";
         }
@@ -75,21 +84,22 @@ public class GenreService {
         genre.get().setName(scanner.nextLine());
         try {
             genreDao.update(genre.get());
-        } catch (LibraryDataAccessException e) {
+        } catch (Exception e) {
             LOGGER.error("Failed to update genre, cause `{}`", e.getMessage());
             return "Something went wrong, the genre was not updated!";
         }
         return genre.get().toString();
     }
 
+    @Transactional
     public String delete(long id) {
-        Optional<Genre> genre = genreDao.getByIdOptional(id);
+        Optional<Genre> genre = genreDao.findById(id);
         if (genre.isEmpty()) {
             return "Genre not found!";
         }
         try {
             genreDao.deleteById(id);
-        } catch (LibraryDataAccessException e) {
+        } catch (Exception e) {
             LOGGER.error("Failed to update genre, cause `{}`", e.getMessage());
             return "Something went wrong, the genre was not deleted!";
         }

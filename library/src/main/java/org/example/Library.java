@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.sql.SQLException;
 
 @SpringBootApplication
-public class Main {
+public class Library {
     public static void main(String[] args) throws SQLException {
-        SpringApplication.run(Main.class, args);
+        SpringApplication.run(Library.class, args);
     }
 }

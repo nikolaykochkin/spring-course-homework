@@ -1,54 +1,26 @@
 package org.example.model;
 
-import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "genres")
 public class Genre {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
-
-    public Genre(long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public Genre(String name) {
-        this.name = name;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return "Genre{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Genre genre = (Genre) o;
-        return id == genre.id && name.equals(genre.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name);
-    }
 }

@@ -6,13 +6,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookDao {
-    Book getById(long id);
+    Optional<Book> findById(long id);
 
-    Optional<Book> getByIdOptional(long id);
+    List<Book> findAll();
 
-    List<Book> getAll();
-
-    long insert(Book book);
+    Book save(Book book);
 
     void update(Book book);
 

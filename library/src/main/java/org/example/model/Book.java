@@ -1,78 +1,50 @@
 package org.example.model;
 
-import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "books")
+@NamedEntityGraph(name = "books-entity-graph",
+        attributeNodes = {@NamedAttributeNode("author"), @NamedAttributeNode("genre")})
 public class Book {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @ManyToOne(targetEntity = Author.class)
+    @JoinColumn(name = "author_id")
     private Author author;
+
+    @ManyToOne(targetEntity = Genre.class)
+    @JoinColumn(name = "genre_id")
     private Genre genre;
 
-    public Book(long id, String name, Author author, Genre genre) {
-        this.id = id;
-        this.name = name;
-        this.author = author;
-        this.genre = genre;
-    }
-
-    public Book(String name, Author author, Genre genre) {
-        this.name = name;
-        this.author = author;
-        this.genre = genre;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Author getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(Author author) {
-        this.author = author;
-    }
-
-    public Genre getGenre() {
-        return genre;
-    }
-
-    public void setGenre(Genre genre) {
-        this.genre = genre;
-    }
-
-    @Override
-    public String toString() {
-        return "Book{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", author=" + author +
-                ", genre=" + genre +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Book book = (Book) o;
-        return id == book.id && name.equals(book.name) && author.equals(book.author) && genre.equals(book.genre);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, author, genre);
-    }
+    @BatchSize(size = 10)
+    @OneToMany(targetEntity = Comment.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id")
+    private List<Comment> comments;
 }

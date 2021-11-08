@@ -1,12 +1,13 @@
 package org.example.service;
 
 import org.example.dao.AuthorDao;
-import org.example.exception.LibraryDataAccessException;
 import org.example.model.Author;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -31,7 +32,13 @@ public class AuthorService {
     }
 
     public String find(long id) {
-        return authorDao.getByIdOptional(id)
+        Optional<Author> authorOptional = Optional.empty();
+        try {
+            authorOptional = authorDao.findById(id);
+        } catch (Exception e) {
+            LOGGER.error("Failed to find author by id `{}`, cause `{}`", id, e.getMessage());
+        }
+        return authorOptional
                 .map(Author::toString)
                 .orElse("Author not found!");
     }
@@ -39,10 +46,10 @@ public class AuthorService {
     public String list() {
         Optional<String> authors = Optional.empty();
         try {
-            authors = Optional.of(authorDao.getAll().stream()
+            authors = Optional.of(authorDao.findAll().stream()
                     .map(Author::toString)
                     .collect(Collectors.joining("\n")));
-        } catch (LibraryDataAccessException e) {
+        } catch (Exception e) {
             LOGGER.error("Failed to get authors list, cause `{}`", e.getMessage());
         }
 
@@ -53,20 +60,23 @@ public class AuthorService {
         }
     }
 
+    @Transactional
     public String insert() {
         printStream.print("Enter author name: ");
-        Author author = new Author(scanner.nextLine());
+        Author author = new Author();
+        author.setName(scanner.nextLine());
         try {
-            authorDao.insert(author);
-        } catch (LibraryDataAccessException e) {
+            authorDao.save(author);
+        } catch (Exception e) {
             LOGGER.error("Failed to save author, cause `{}`", e.getMessage());
             return "Something went wrong, the author was not saved!";
         }
         return author.toString();
     }
 
+    @Transactional
     public String update(long id) {
-        Optional<Author> author = authorDao.getByIdOptional(id);
+        Optional<Author> author = authorDao.findById(id);
         if (author.isEmpty()) {
             return "Author not found!";
         }
@@ -78,7 +88,7 @@ public class AuthorService {
 
         try {
             authorDao.update(author.get());
-        } catch (LibraryDataAccessException e) {
+        } catch (Exception e) {
             LOGGER.error("Failed to update author, cause `{}`", e.getMessage());
             return "Something went wrong, the author was not updated!";
         }
@@ -86,15 +96,16 @@ public class AuthorService {
         return author.get().toString();
     }
 
+    @Transactional
     public String delete(long id) {
-        Optional<Author> author = authorDao.getByIdOptional(id);
+        Optional<Author> author = authorDao.findById(id);
         if (author.isEmpty()) {
             return "Author not found!";
         }
 
         try {
             authorDao.deleteById(id);
-        } catch (LibraryDataAccessException e) {
+        } catch (Exception e) {
             LOGGER.error("Failed to update author, cause `{}`", e.getMessage());
             return "Something went wrong, the author was not deleted!";
         }

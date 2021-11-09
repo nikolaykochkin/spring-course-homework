@@ -1,4 +1,4 @@
-package org.example.dao;
+package org.example.repository;
 
 import org.example.model.Author;
 import org.example.model.Book;
@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,8 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 @DataJpaTest
-@Import(BookDaoJpa.class)
-class BookDaoJpaTest {
+class BookRepositoryTest {
     public static final long FIRST_BOOK_ID = 1L;
     public static final long FIRST_AUTHOR_ID = 1L;
     public static final long FIRST_GENRE_ID = 1L;
@@ -26,7 +24,7 @@ class BookDaoJpaTest {
     public static final String EXAMPLE_BOOK_NAME = "Example Book";
 
     @Autowired
-    private BookDaoJpa bookDaoJpa;
+    private BookRepository bookRepository;
 
     @Autowired
     private TestEntityManager em;
@@ -35,7 +33,7 @@ class BookDaoJpaTest {
     void should_FindExpectedBook_When_FindById() {
         Book expected = em.find(Book.class, FIRST_BOOK_ID);
 
-        Optional<Book> actual = bookDaoJpa.findById(FIRST_BOOK_ID);
+        Optional<Book> actual = bookRepository.findById(FIRST_BOOK_ID);
 
         assertEquals(expected, actual.orElse(null));
     }
@@ -46,7 +44,7 @@ class BookDaoJpaTest {
                 .createQuery("select b from Book b", Book.class)
                 .getResultList();
 
-        List<Book> actual = bookDaoJpa.findAll();
+        List<Book> actual = bookRepository.findAll();
 
         assertIterableEquals(expected, actual);
     }
@@ -61,7 +59,7 @@ class BookDaoJpaTest {
         expected.setAuthor(author);
         expected.setGenre(genre);
 
-        bookDaoJpa.save(expected);
+        bookRepository.save(expected);
         em.flush();
         Book actual = em.find(Book.class, expected.getId());
 
@@ -74,7 +72,7 @@ class BookDaoJpaTest {
         Genre genre = new Genre(FIRST_GENRE_ID, null);
         Book expected = new Book(FIRST_BOOK_ID, EXAMPLE_BOOK_NAME, author, genre, null);
 
-        bookDaoJpa.update(expected);
+        bookRepository.save(expected);
         em.flush();
         Book actual = em.find(Book.class, FIRST_BOOK_ID);
 
@@ -83,7 +81,7 @@ class BookDaoJpaTest {
 
     @Test
     void should_ReturnNoBook_When_DeleteById() {
-        bookDaoJpa.deleteById(LAST_BOOK_ID);
+        bookRepository.deleteById(LAST_BOOK_ID);
         em.flush();
         Book Book = em.find(Book.class, LAST_BOOK_ID);
         assertNull(Book);

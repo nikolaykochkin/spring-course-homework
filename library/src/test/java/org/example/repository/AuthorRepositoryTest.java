@@ -1,27 +1,27 @@
-package org.example.dao;
+package org.example.repository;
 
 import org.example.model.Author;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @DataJpaTest
-@Import(AuthorDaoJpa.class)
-class AuthorDaoJpaTest {
+class AuthorRepositoryTest {
 
     public static final long FIRST_AUTHOR_ID = 1L;
     public static final long LAST_AUTHOR_ID = 4L;
     public static final String EXAMPLE_AUTHOR_NAME = "Example Author";
 
     @Autowired
-    private AuthorDaoJpa authorDaoJpa;
+    private AuthorRepository authorRepository;
 
     @Autowired
     private TestEntityManager em;
@@ -30,7 +30,7 @@ class AuthorDaoJpaTest {
     void should_FindExpectedAuthor_When_FindById() {
         Author expected = em.find(Author.class, FIRST_AUTHOR_ID);
 
-        Optional<Author> actual = authorDaoJpa.findById(FIRST_AUTHOR_ID);
+        Optional<Author> actual = authorRepository.findById(FIRST_AUTHOR_ID);
 
         assertEquals(expected, actual.orElse(null));
     }
@@ -41,7 +41,7 @@ class AuthorDaoJpaTest {
                 .createQuery("select a from Author a", Author.class)
                 .getResultList();
 
-        List<Author> actual = authorDaoJpa.findAll();
+        List<Author> actual = authorRepository.findAll();
 
         assertIterableEquals(expected, actual);
     }
@@ -51,7 +51,7 @@ class AuthorDaoJpaTest {
         Author expected = new Author();
         expected.setName(EXAMPLE_AUTHOR_NAME);
 
-        authorDaoJpa.save(expected);
+        authorRepository.save(expected);
         em.flush();
         Author actual = em.find(Author.class, expected.getId());
 
@@ -62,7 +62,7 @@ class AuthorDaoJpaTest {
     void should_ChangeAuthorName_When_UpdateAuthor() {
         Author expected = new Author(FIRST_AUTHOR_ID, EXAMPLE_AUTHOR_NAME);
 
-        authorDaoJpa.update(expected);
+        authorRepository.save(expected);
         em.flush();
         Author actual = em.find(Author.class, FIRST_AUTHOR_ID);
 
@@ -71,7 +71,7 @@ class AuthorDaoJpaTest {
 
     @Test
     void should_ReturnNoAuthor_When_DeleteById() {
-        authorDaoJpa.deleteById(LAST_AUTHOR_ID);
+        authorRepository.deleteById(LAST_AUTHOR_ID);
         em.flush();
         Author author = em.find(Author.class, LAST_AUTHOR_ID);
         assertNull(author);

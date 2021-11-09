@@ -1,8 +1,8 @@
 package org.example.service;
 
-import org.example.dao.AuthorDao;
-import org.example.dao.BookDao;
-import org.example.dao.GenreDao;
+import org.example.repository.AuthorRepository;
+import org.example.repository.BookRepository;
+import org.example.repository.GenreRepository;
 import org.example.model.Author;
 import org.example.model.Book;
 import org.example.model.Genre;
@@ -23,20 +23,20 @@ import java.util.stream.Collectors;
 public class BookService {
     private final static Logger LOGGER = LoggerFactory.getLogger(BookService.class);
 
-    private final BookDao bookDao;
-    private final AuthorDao authorDao;
-    private final GenreDao genreDao;
+    private final BookRepository bookRepository;
+    private final AuthorRepository authorRepository;
+    private final GenreRepository genreRepository;
     private final Scanner scanner;
     private final PrintStream printStream;
 
-    public BookService(BookDao bookDao,
-                       AuthorDao authorDao,
-                       GenreDao genreDao,
+    public BookService(BookRepository bookRepository,
+                       AuthorRepository authorRepository,
+                       GenreRepository genreRepository,
                        @Value("#{T(java.lang.System).in}") InputStream inputStream,
                        @Value("#{T(java.lang.System).out}") PrintStream printStream) {
-        this.bookDao = bookDao;
-        this.authorDao = authorDao;
-        this.genreDao = genreDao;
+        this.bookRepository = bookRepository;
+        this.authorRepository = authorRepository;
+        this.genreRepository = genreRepository;
         this.scanner = new Scanner(inputStream);
         this.printStream = printStream;
     }
@@ -45,7 +45,7 @@ public class BookService {
     public String find(long id) {
         Optional<Book> optionalBook = Optional.empty();
         try {
-            optionalBook = bookDao.findById(id);
+            optionalBook = bookRepository.findById(id);
         } catch (Exception e) {
             LOGGER.error("Failed to find book by id `{}`, cause `{}`", id, e.getMessage());
         }
@@ -58,7 +58,7 @@ public class BookService {
     public String list() {
         Optional<String> books = Optional.empty();
         try {
-            books = Optional.of(bookDao.findAll().stream()
+            books = Optional.of(bookRepository.findAll().stream()
                     .map(Book::toString)
                     .collect(Collectors.joining("\n")));
         } catch (Exception e) {
@@ -76,18 +76,18 @@ public class BookService {
         printStream.print("Enter book name: ");
         String name = scanner.nextLine();
         printStream.print("Enter author id: ");
-        Optional<Author> author = authorDao.findById(Long.parseLong(scanner.nextLine()));
+        Optional<Author> author = authorRepository.findById(Long.parseLong(scanner.nextLine()));
         if (author.isEmpty()) {
             return "Author not found!";
         }
         printStream.print("Enter genre id: ");
-        Optional<Genre> genre = genreDao.findById(Long.parseLong(scanner.nextLine()));
+        Optional<Genre> genre = genreRepository.findById(Long.parseLong(scanner.nextLine()));
         if (genre.isEmpty()) {
             return "Genre not found!";
         }
         Book book = new Book(0, name, author.get(), genre.get(), null);
         try {
-            bookDao.save(book);
+            bookRepository.save(book);
         } catch (Exception e) {
             LOGGER.error("Failed to save book, cause `{}`", e.getMessage());
             return "Something went wrong, the book was not saved!";
@@ -97,7 +97,7 @@ public class BookService {
 
     @Transactional
     public String update(long id) {
-        Optional<Book> book = bookDao.findById(id);
+        Optional<Book> book = bookRepository.findById(id);
         if (book.isEmpty()) {
             return "Book not found!";
         }
@@ -106,18 +106,18 @@ public class BookService {
         printStream.print("Enter new book name: ");
         book.get().setName(scanner.nextLine());
         printStream.print("Enter new author id: ");
-        Optional<Author> author = authorDao.findById(Long.parseLong(scanner.nextLine()));
+        Optional<Author> author = authorRepository.findById(Long.parseLong(scanner.nextLine()));
         if (author.isEmpty()) {
             return "Author not found!";
         }
         book.get().setAuthor(author.get());
         printStream.print("Enter new genre id: ");
-        Optional<Genre> genre = genreDao.findById(Long.parseLong(scanner.nextLine()));
+        Optional<Genre> genre = genreRepository.findById(Long.parseLong(scanner.nextLine()));
         if (genre.isEmpty()) {
             return "Genre not found!";
         }
         try {
-            bookDao.update(book.get());
+            bookRepository.save(book.get());
         } catch (Exception e) {
             LOGGER.error("Failed to update book, cause `{}`", e.getMessage());
             return "Something went wrong, the book was not updated!";
@@ -127,12 +127,12 @@ public class BookService {
 
     @Transactional
     public String delete(long id) {
-        Optional<Book> book = bookDao.findById(id);
+        Optional<Book> book = bookRepository.findById(id);
         if (book.isEmpty()) {
             return "Book not found!";
         }
         try {
-            bookDao.deleteById(id);
+            bookRepository.deleteById(id);
         } catch (Exception e) {
             LOGGER.error("Failed to update book, cause `{}`", e.getMessage());
             return "Something went wrong, the book was not deleted!";

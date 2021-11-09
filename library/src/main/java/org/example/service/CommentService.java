@@ -1,7 +1,7 @@
 package org.example.service;
 
-import org.example.dao.BookDao;
-import org.example.dao.CommentDao;
+import org.example.repository.BookRepository;
+import org.example.repository.CommentRepository;
 import org.example.model.Book;
 import org.example.model.Comment;
 import org.slf4j.Logger;
@@ -20,17 +20,17 @@ import java.util.stream.Collectors;
 public class CommentService {
     private final static Logger LOGGER = LoggerFactory.getLogger(CommentService.class);
 
-    private final CommentDao commentDao;
-    private final BookDao bookDao;
+    private final CommentRepository commentRepository;
+    private final BookRepository bookRepository;
     private final Scanner scanner;
     private final PrintStream printStream;
 
-    public CommentService(CommentDao commentDao,
-                          BookDao bookDao,
+    public CommentService(CommentRepository commentRepository,
+                          BookRepository bookRepository,
                           @Value("#{T(java.lang.System).in}") InputStream inputStream,
                           @Value("#{T(java.lang.System).out}") PrintStream printStream) {
-        this.commentDao = commentDao;
-        this.bookDao = bookDao;
+        this.commentRepository = commentRepository;
+        this.bookRepository = bookRepository;
         this.scanner = new Scanner(inputStream);
         this.printStream = printStream;
     }
@@ -38,7 +38,7 @@ public class CommentService {
     public String find(long id) {
         Optional<Comment> optionalComment = Optional.empty();
         try {
-            optionalComment = commentDao.findById(id);
+            optionalComment = commentRepository.findById(id);
         } catch (Exception e) {
             LOGGER.error("Failed to find comment by id `{}`, cause `{}`", id, e.getMessage());
         }
@@ -50,7 +50,7 @@ public class CommentService {
     public String list() {
         Optional<String> comments = Optional.empty();
         try {
-            comments = Optional.of(commentDao.findAll().stream()
+            comments = Optional.of(commentRepository.findAll().stream()
                     .map(Comment::toString)
                     .collect(Collectors.joining("\n")));
         } catch (Exception e) {
@@ -66,7 +66,7 @@ public class CommentService {
     @Transactional
     public String insert() {
         printStream.print("Enter book id: ");
-        Optional<Book> book = bookDao.findById(Long.parseLong(scanner.nextLine()));
+        Optional<Book> book = bookRepository.findById(Long.parseLong(scanner.nextLine()));
         if (book.isEmpty()) {
             return "Book not found!";
         }
@@ -75,7 +75,7 @@ public class CommentService {
         comment.setText(scanner.nextLine());
         comment.setBook(book.get());
         try {
-            commentDao.save(comment);
+            commentRepository.save(comment);
         } catch (Exception e) {
             LOGGER.error("Failed to save comment, cause `{}`", e.getMessage());
             return "Something went wrong, the comment was not saved!";
@@ -85,7 +85,7 @@ public class CommentService {
 
     @Transactional
     public String update(long id) {
-        Optional<Comment> comment = commentDao.findById(id);
+        Optional<Comment> comment = commentRepository.findById(id);
         if (comment.isEmpty()) {
             return "Comment not found!";
         }
@@ -94,7 +94,7 @@ public class CommentService {
         printStream.print("Enter new comment name: ");
         comment.get().setText(scanner.nextLine());
         try {
-            commentDao.update(comment.get());
+            commentRepository.save(comment.get());
         } catch (Exception e) {
             LOGGER.error("Failed to update comment, cause `{}`", e.getMessage());
             return "Something went wrong, the comment was not updated!";
@@ -104,12 +104,12 @@ public class CommentService {
 
     @Transactional
     public String delete(long id) {
-        Optional<Comment> comment = commentDao.findById(id);
+        Optional<Comment> comment = commentRepository.findById(id);
         if (comment.isEmpty()) {
             return "Comment not found!";
         }
         try {
-            commentDao.deleteById(id);
+            commentRepository.deleteById(id);
         } catch (Exception e) {
             LOGGER.error("Failed to update comment, cause `{}`", e.getMessage());
             return "Something went wrong, the comment was not deleted!";

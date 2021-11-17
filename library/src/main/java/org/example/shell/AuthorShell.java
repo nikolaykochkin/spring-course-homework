@@ -13,9 +13,9 @@ public class AuthorShell {
         this.authorService = authorService;
     }
 
-    @ShellMethod(value = "Find author by id", key = {"af", "author find"})
-    public String find(@ShellOption long id) {
-        return authorService.find(id);
+    @ShellMethod(value = "Find author by name", key = {"af", "author find"})
+    public String find(@ShellOption String name) {
+        return authorService.find(name);
     }
 
     @ShellMethod(value = "List of authors", key = {"al", "author list"})
@@ -28,13 +28,13 @@ public class AuthorShell {
         return authorService.insert();
     }
 
-    @ShellMethod(value = "Update author by id", key = {"au", "author update"})
-    public String update(@ShellOption long id) {
-        return authorService.update(id);
+    @ShellMethod(value = "Update author by name", key = {"au", "author update"})
+    public String update(@ShellOption String name) {
+        return authorService.update(name);
     }
 
-    @ShellMethod(value = "Delete author by id", key = {"ad", "author delete"})
-    public String delete(@ShellOption long id) {
-        return authorService.delete(id);
+    @ShellMethod(value = "Delete author by name", key = {"ad", "author delete"})
+    public String delete(@ShellOption String name) {
+        return authorService.delete(name);
     }
 }

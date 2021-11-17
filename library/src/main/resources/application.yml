@@ -1,21 +1,4 @@
 spring:
-  datasource:
-    url: jdbc:h2:mem:testdb
-  sql:
-    init:
-      schema-locations: schema.sql
-      data-locations: data.sql
-      mode: always
-  jpa:
-    generate-ddl: false
-    hibernate:
-      ddl-auto: none
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-
-
-logging:
-  level:
-    root: ERROR
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/library

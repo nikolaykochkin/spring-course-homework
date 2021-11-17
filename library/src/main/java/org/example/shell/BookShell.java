@@ -13,9 +13,9 @@ public class BookShell {
         this.bookService = bookService;
     }
 
-    @ShellMethod(value = "Find book by id", key = {"bf", "book find"})
-    public String find(@ShellOption long id) {
-        return bookService.find(id);
+    @ShellMethod(value = "Find book by title", key = {"bf", "book find"})
+    public String find(@ShellOption String title) {
+        return bookService.find(title);
     }
 
     @ShellMethod(value = "List of books", key = {"bl", "book list"})
@@ -28,14 +28,14 @@ public class BookShell {
         return bookService.insert();
     }
 
-    @ShellMethod(value = "Update book by id", key = {"bu", "book update"})
-    public String update(@ShellOption long id) {
-        return bookService.update(id);
+    @ShellMethod(value = "Update book by title", key = {"bu", "book update"})
+    public String update(@ShellOption String title) {
+        return bookService.update(title);
     }
 
-    @ShellMethod(value = "Delete book", key = {"bd", "book delete"})
-    public String delete(@ShellOption long id) {
-        return bookService.delete(id);
+    @ShellMethod(value = "Delete book by title", key = {"bd", "book delete"})
+    public String delete(@ShellOption String title) {
+        return bookService.delete(title);
     }
 
 }

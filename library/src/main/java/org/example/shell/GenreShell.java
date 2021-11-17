@@ -13,9 +13,9 @@ public class GenreShell {
         this.genreService = genreService;
     }
 
-    @ShellMethod(value = "Find genre by id", key = {"gf", "genre find"})
-    public String find(@ShellOption long id) {
-        return genreService.find(id);
+    @ShellMethod(value = "Find genre by name", key = {"gf", "genre find"})
+    public String find(@ShellOption String name) {
+        return genreService.find(name);
     }
 
     @ShellMethod(value = "List of genres", key = {"gl", "genre list"})
@@ -28,13 +28,13 @@ public class GenreShell {
         return genreService.insert();
     }
 
-    @ShellMethod(value = "Update genre by id", key = {"gu", "genre update"})
-    public String update(@ShellOption long id) {
-        return genreService.update(id);
+    @ShellMethod(value = "Update genre by name", key = {"gu", "genre update"})
+    public String update(@ShellOption String name) {
+        return genreService.update(name);
     }
 
-    @ShellMethod(value = "Delete genre by id", key = {"gd", "genre delete"})
-    public String delete(@ShellOption long id) {
-        return genreService.delete(id);
+    @ShellMethod(value = "Delete genre by name", key = {"gd", "genre delete"})
+    public String delete(@ShellOption String name) {
+        return genreService.delete(name);
     }
 }

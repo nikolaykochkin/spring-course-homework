@@ -35,7 +35,7 @@ public class CommentService {
         this.printStream = printStream;
     }
 
-    public String find(long id) {
+    public String find(String id) {
         Optional<Comment> optionalComment = Optional.empty();
         try {
             optionalComment = commentRepository.findById(id);
@@ -65,8 +65,8 @@ public class CommentService {
 
     @Transactional
     public String insert() {
-        printStream.print("Enter book id: ");
-        Optional<Book> book = bookRepository.findById(Long.parseLong(scanner.nextLine()));
+        printStream.print("Enter book title: ");
+        Optional<Book> book = bookRepository.findBookByTitleContains(scanner.nextLine());
         if (book.isEmpty()) {
             return "Book not found!";
         }
@@ -84,7 +84,7 @@ public class CommentService {
     }
 
     @Transactional
-    public String update(long id) {
+    public String update(String id) {
         Optional<Comment> comment = commentRepository.findById(id);
         if (comment.isEmpty()) {
             return "Comment not found!";
@@ -103,7 +103,7 @@ public class CommentService {
     }
 
     @Transactional
-    public String delete(long id) {
+    public String delete(String id) {
         Optional<Comment> comment = commentRepository.findById(id);
         if (comment.isEmpty()) {
             return "Comment not found!";

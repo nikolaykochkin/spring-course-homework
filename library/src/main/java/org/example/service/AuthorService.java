@@ -31,12 +31,12 @@ public class AuthorService {
         this.printStream = printStream;
     }
 
-    public String find(long id) {
+    public String find(String name) {
         Optional<Author> authorOptional = Optional.empty();
         try {
-            authorOptional = authorRepository.findById(id);
+            authorOptional = authorRepository.findAuthorByNameContains(name);
         } catch (Exception e) {
-            LOGGER.error("Failed to find author by id `{}`, cause `{}`", id, e.getMessage());
+            LOGGER.error("Failed to find author by name `{}`, cause `{}`", name, e.getMessage());
         }
         return authorOptional
                 .map(Author::toString)
@@ -75,8 +75,8 @@ public class AuthorService {
     }
 
     @Transactional
-    public String update(long id) {
-        Optional<Author> author = authorRepository.findById(id);
+    public String update(String name) {
+        Optional<Author> author = authorRepository.findAuthorByNameContains(name);
         if (author.isEmpty()) {
             return "Author not found!";
         }
@@ -97,14 +97,14 @@ public class AuthorService {
     }
 
     @Transactional
-    public String delete(long id) {
-        Optional<Author> author = authorRepository.findById(id);
+    public String delete(String name) {
+        Optional<Author> author = authorRepository.findAuthorByNameContains(name);
         if (author.isEmpty()) {
             return "Author not found!";
         }
 
         try {
-            authorRepository.deleteById(id);
+            authorRepository.deleteById(author.get().getId());
         } catch (Exception e) {
             LOGGER.error("Failed to update author, cause `{}`", e.getMessage());
             return "Something went wrong, the author was not deleted!";

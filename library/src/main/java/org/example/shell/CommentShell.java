@@ -14,7 +14,7 @@ public class CommentShell {
     }
 
     @ShellMethod(value = "Find comment by id", key = {"cf", "comment find"})
-    public String find(@ShellOption long id) {
+    public String find(@ShellOption String id) {
         return commentService.find(id);
     }
 
@@ -29,12 +29,12 @@ public class CommentShell {
     }
 
     @ShellMethod(value = "Update comment by id", key = {"cu", "comment update"})
-    public String update(@ShellOption long id) {
+    public String update(@ShellOption String id) {
         return commentService.update(id);
     }
 
     @ShellMethod(value = "Delete comment by id", key = {"cd", "comment delete"})
-    public String delete(@ShellOption long id) {
+    public String delete(@ShellOption String id) {
         return commentService.delete(id);
     }
 }

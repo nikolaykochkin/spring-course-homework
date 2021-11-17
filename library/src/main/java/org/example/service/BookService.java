@@ -42,12 +42,12 @@ public class BookService {
     }
 
     @Transactional(readOnly = true)
-    public String find(long id) {
+    public String find(String title) {
         Optional<Book> optionalBook = Optional.empty();
         try {
-            optionalBook = bookRepository.findById(id);
+            optionalBook = bookRepository.findBookByTitleContains(title);
         } catch (Exception e) {
-            LOGGER.error("Failed to find book by id `{}`, cause `{}`", id, e.getMessage());
+            LOGGER.error("Failed to find book by title `{}`, cause `{}`", title, e.getMessage());
         }
         return optionalBook
                 .map(Book::toString)
@@ -73,19 +73,19 @@ public class BookService {
 
     @Transactional
     public String insert() {
-        printStream.print("Enter book name: ");
-        String name = scanner.nextLine();
-        printStream.print("Enter author id: ");
-        Optional<Author> author = authorRepository.findById(Long.parseLong(scanner.nextLine()));
+        printStream.print("Enter book title: ");
+        String title = scanner.nextLine();
+        printStream.print("Enter author name: ");
+        Optional<Author> author = authorRepository.findAuthorByNameContains(scanner.nextLine());
         if (author.isEmpty()) {
             return "Author not found!";
         }
-        printStream.print("Enter genre id: ");
-        Optional<Genre> genre = genreRepository.findById(Long.parseLong(scanner.nextLine()));
+        printStream.print("Enter genre name: ");
+        Optional<Genre> genre = genreRepository.findGenreByNameContains(scanner.nextLine());
         if (genre.isEmpty()) {
             return "Genre not found!";
         }
-        Book book = new Book(0, name, author.get(), genre.get(), null);
+        Book book = new Book(null, title, author.get(), genre.get());
         try {
             bookRepository.save(book);
         } catch (Exception e) {
@@ -96,26 +96,27 @@ public class BookService {
     }
 
     @Transactional
-    public String update(long id) {
-        Optional<Book> book = bookRepository.findById(id);
+    public String update(String title) {
+        Optional<Book> book = bookRepository.findBookByTitleContains(title);
         if (book.isEmpty()) {
             return "Book not found!";
         }
         printStream.println("Found book:");
         printStream.println(book);
-        printStream.print("Enter new book name: ");
-        book.get().setName(scanner.nextLine());
-        printStream.print("Enter new author id: ");
-        Optional<Author> author = authorRepository.findById(Long.parseLong(scanner.nextLine()));
+        printStream.print("Enter new book title: ");
+        book.get().setTitle(scanner.nextLine());
+        printStream.print("Enter author name: ");
+        Optional<Author> author = authorRepository.findAuthorByNameContains(scanner.nextLine());
         if (author.isEmpty()) {
             return "Author not found!";
         }
         book.get().setAuthor(author.get());
-        printStream.print("Enter new genre id: ");
-        Optional<Genre> genre = genreRepository.findById(Long.parseLong(scanner.nextLine()));
+        printStream.print("Enter genre name: ");
+        Optional<Genre> genre = genreRepository.findGenreByNameContains(scanner.nextLine());
         if (genre.isEmpty()) {
             return "Genre not found!";
         }
+        book.get().setGenre(genre.get());
         try {
             bookRepository.save(book.get());
         } catch (Exception e) {
@@ -126,13 +127,13 @@ public class BookService {
     }
 
     @Transactional
-    public String delete(long id) {
-        Optional<Book> book = bookRepository.findById(id);
+    public String delete(String title) {
+        Optional<Book> book = bookRepository.findBookByTitleContains(title);
         if (book.isEmpty()) {
             return "Book not found!";
         }
         try {
-            bookRepository.deleteById(id);
+            bookRepository.deleteById(book.get().getId());
         } catch (Exception e) {
             LOGGER.error("Failed to update book, cause `{}`", e.getMessage());
             return "Something went wrong, the book was not deleted!";

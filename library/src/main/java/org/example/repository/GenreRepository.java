@@ -1,8 +1,10 @@
 package org.example.repository;
 
 import org.example.model.Genre;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface GenreRepository extends JpaRepository<Genre, Long> {
+import java.util.Optional;
 
+public interface GenreRepository extends MongoRepository<Genre, String> {
+    Optional<Genre> findGenreByNameContains(String name);
 }

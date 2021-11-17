@@ -1,8 +1,10 @@
 package org.example.repository;
 
 import org.example.model.Author;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface AuthorRepository extends JpaRepository<Author, Long> {
+import java.util.Optional;
 
+public interface AuthorRepository extends MongoRepository<Author, String> {
+    Optional<Author> findAuthorByNameContains(String name);
 }

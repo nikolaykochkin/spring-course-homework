@@ -30,12 +30,12 @@ public class GenreService {
         this.printStream = printStream;
     }
 
-    public String find(long id) {
+    public String find(String name) {
         Optional<Genre> optionalGenre = Optional.empty();
         try {
-            optionalGenre = genreRepository.findById(id);
+            optionalGenre = genreRepository.findGenreByNameContains(name);
         } catch (Exception e) {
-            LOGGER.error("Failed to find genre by id `{}`, cause `{}`", id, e.getMessage());
+            LOGGER.error("Failed to find genre by name `{}`, cause `{}`", name, e.getMessage());
         }
         return optionalGenre
                 .map(Genre::toString)
@@ -73,8 +73,8 @@ public class GenreService {
     }
 
     @Transactional
-    public String update(long id) {
-        Optional<Genre> genre = genreRepository.findById(id);
+    public String update(String name) {
+        Optional<Genre> genre = genreRepository.findGenreByNameContains(name);
         if (genre.isEmpty()) {
             return "Genre not found!";
         }
@@ -92,13 +92,13 @@ public class GenreService {
     }
 
     @Transactional
-    public String delete(long id) {
-        Optional<Genre> genre = genreRepository.findById(id);
+    public String delete(String name) {
+        Optional<Genre> genre = genreRepository.findGenreByNameContains(name);
         if (genre.isEmpty()) {
             return "Genre not found!";
         }
         try {
-            genreRepository.deleteById(id);
+            genreRepository.deleteById(genre.get().getId());
         } catch (Exception e) {
             LOGGER.error("Failed to update genre, cause `{}`", e.getMessage());
             return "Something went wrong, the genre was not deleted!";

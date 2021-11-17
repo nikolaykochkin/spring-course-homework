@@ -114,6 +114,6 @@ public class CommentService {
             LOGGER.error("Failed to update comment, cause `{}`", e.getMessage());
             return "Something went wrong, the comment was not deleted!";
         }
-        return comment + " deleted";
+        return comment.get() + " deleted";
     }
 }

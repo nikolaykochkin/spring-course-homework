@@ -1,14 +1,13 @@
 package org.example.service;
 
-import org.example.repository.BookRepository;
-import org.example.repository.CommentRepository;
 import org.example.model.Book;
 import org.example.model.Comment;
+import org.example.repository.BookRepository;
+import org.example.repository.CommentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -63,7 +62,6 @@ public class CommentService {
         }
     }
 
-    @Transactional
     public String insert() {
         printStream.print("Enter book title: ");
         Optional<Book> book = bookRepository.findBookByTitleContains(scanner.nextLine());
@@ -83,7 +81,6 @@ public class CommentService {
         return comment.toString();
     }
 
-    @Transactional
     public String update(String id) {
         Optional<Comment> comment = commentRepository.findById(id);
         if (comment.isEmpty()) {
@@ -102,7 +99,6 @@ public class CommentService {
         return comment.get().toString();
     }
 
-    @Transactional
     public String delete(String id) {
         Optional<Comment> comment = commentRepository.findById(id);
         if (comment.isEmpty()) {

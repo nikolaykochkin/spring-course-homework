@@ -1,12 +1,11 @@
 package org.example.service;
 
-import org.example.repository.GenreRepository;
 import org.example.model.Genre;
+import org.example.repository.GenreRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -58,7 +57,6 @@ public class GenreService {
         }
     }
 
-    @Transactional
     public String insert() {
         printStream.print("Enter genre name: ");
         Genre genre = new Genre();
@@ -72,7 +70,6 @@ public class GenreService {
         return genre.toString();
     }
 
-    @Transactional
     public String update(String name) {
         Optional<Genre> genre = genreRepository.findGenreByNameContains(name);
         if (genre.isEmpty()) {
@@ -91,7 +88,6 @@ public class GenreService {
         return genre.get().toString();
     }
 
-    @Transactional
     public String delete(String name) {
         Optional<Genre> genre = genreRepository.findGenreByNameContains(name);
         if (genre.isEmpty()) {

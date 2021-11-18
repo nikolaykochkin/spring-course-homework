@@ -1,13 +1,11 @@
 package org.example.service;
 
-import org.example.repository.AuthorRepository;
 import org.example.model.Author;
+import org.example.repository.AuthorRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -60,7 +58,6 @@ public class AuthorService {
         }
     }
 
-    @Transactional
     public String insert() {
         printStream.print("Enter author name: ");
         Author author = new Author();
@@ -74,7 +71,6 @@ public class AuthorService {
         return author.toString();
     }
 
-    @Transactional
     public String update(String name) {
         Optional<Author> author = authorRepository.findAuthorByNameContains(name);
         if (author.isEmpty()) {
@@ -96,7 +92,6 @@ public class AuthorService {
         return author.get().toString();
     }
 
-    @Transactional
     public String delete(String name) {
         Optional<Author> author = authorRepository.findAuthorByNameContains(name);
         if (author.isEmpty()) {

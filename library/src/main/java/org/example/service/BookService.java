@@ -1,17 +1,15 @@
 package org.example.service;
 
-import org.example.repository.AuthorRepository;
-import org.example.repository.BookRepository;
-import org.example.repository.GenreRepository;
 import org.example.model.Author;
 import org.example.model.Book;
 import org.example.model.Genre;
+import org.example.repository.AuthorRepository;
+import org.example.repository.BookRepository;
+import org.example.repository.GenreRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -41,7 +39,6 @@ public class BookService {
         this.printStream = printStream;
     }
 
-    @Transactional(readOnly = true)
     public String find(String title) {
         Optional<Book> optionalBook = Optional.empty();
         try {
@@ -54,7 +51,6 @@ public class BookService {
                 .orElse("Book not found!");
     }
 
-    @Transactional(readOnly = true)
     public String list() {
         Optional<String> books = Optional.empty();
         try {
@@ -71,7 +67,6 @@ public class BookService {
         }
     }
 
-    @Transactional
     public String insert() {
         printStream.print("Enter book title: ");
         String title = scanner.nextLine();
@@ -95,7 +90,6 @@ public class BookService {
         return book.toString();
     }
 
-    @Transactional
     public String update(String title) {
         Optional<Book> book = bookRepository.findBookByTitleContains(title);
         if (book.isEmpty()) {
@@ -126,7 +120,6 @@ public class BookService {
         return book.get().toString();
     }
 
-    @Transactional
     public String delete(String title) {
         Optional<Book> book = bookRepository.findBookByTitleContains(title);
         if (book.isEmpty()) {

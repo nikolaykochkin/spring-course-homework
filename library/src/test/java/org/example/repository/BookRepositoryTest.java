@@ -1,79 +1,73 @@
 package org.example.repository;
 
+import org.example.model.Author;
+import org.example.model.Book;
+import org.example.model.Genre;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
-@DataJpaTest
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+
+@DataMongoTest
 class BookRepositoryTest {
-    public static final long FIRST_BOOK_ID = 1L;
-    public static final long FIRST_AUTHOR_ID = 1L;
-    public static final long FIRST_GENRE_ID = 1L;
-    public static final long LAST_BOOK_ID = 1L;
+    public static final String FIRST_BOOK_TITLE = "War and Peace";
+    public static final String EXAMPLE_AUTHOR_NAME = "Leo Tolstoy";
+    public static final String EXAMPLE_GENRE_NAME = "Novel";
     public static final String EXAMPLE_BOOK_NAME = "Example Book";
 
     @Autowired
     private BookRepository bookRepository;
 
     @Autowired
-    private TestEntityManager em;
+    private MongoTemplate mongoTemplate;
 
     @Test
-    void should_FindExpectedBook_When_FindById() {
-//        Book expected = em.find(Book.class, FIRST_BOOK_ID);
-//
-//        Optional<Book> actual = bookRepository.findById(FIRST_BOOK_ID);
-//
-//        assertEquals(expected, actual.orElse(null));
+    void should_FindExpectedBook_When_FindByTitle() {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("title").is(FIRST_BOOK_TITLE));
+        Book expected = mongoTemplate.findOne(query, Book.class);
+
+        Optional<Book> actual = bookRepository.findBookByTitle(FIRST_BOOK_TITLE);
+
+        assertEquals(expected, actual.orElse(null));
     }
 
     @Test
     void should_FindAllBooks_When_FindAll() {
-//        List<Book> expected = em.getEntityManager()
-//                .createQuery("select b from Book b", Book.class)
-//                .getResultList();
-//
-//        List<Book> actual = bookRepository.findAll();
-//
-//        assertIterableEquals(expected, actual);
+        List<Book> expected = mongoTemplate.findAll(Book.class);
+
+        List<Book> actual = bookRepository.findAll();
+
+        assertIterableEquals(expected, actual);
     }
 
     @Test
     void should_FindNewBook_When_SaveBook() {
-//        Book expected = new Book();
-//        Author author = new Author(FIRST_AUTHOR_ID, null);
-//        Genre genre = new Genre(FIRST_GENRE_ID, null);
-//
-//        expected.setTitle(EXAMPLE_BOOK_NAME);
-//        expected.setAuthor(author);
-//        expected.setGenre(genre);
-//
-//        bookRepository.save(expected);
-//        em.flush();
-//        Book actual = em.find(Book.class, expected.getId());
-//
-//        assertEquals(expected, actual);
-    }
+        Book expected = new Book();
 
-    @Test
-    void should_ChangeBookName_When_UpdateBook() {
-//        Author author = new Author(FIRST_AUTHOR_ID, null);
-//        Genre genre = new Genre(FIRST_GENRE_ID, null);
-//        Book expected = new Book(FIRST_BOOK_ID, EXAMPLE_BOOK_NAME, author, genre, null);
-//
-//        bookRepository.save(expected);
-//        em.flush();
-//        Book actual = em.find(Book.class, FIRST_BOOK_ID);
-//
-//        assertEquals(expected.getTitle(), actual.getTitle());
-    }
+        Query query = new Query();
+        query.addCriteria(Criteria.where("name").is(EXAMPLE_AUTHOR_NAME));
+        Author author = mongoTemplate.findOne(query, Author.class);
 
-    @Test
-    void should_ReturnNoBook_When_DeleteById() {
-//        bookRepository.deleteById(LAST_BOOK_ID);
-//        em.flush();
-//        Book Book = em.find(Book.class, LAST_BOOK_ID);
-//        assertNull(Book);
+        Query query1 = new Query();
+        query1.addCriteria(Criteria.where("name").is(EXAMPLE_GENRE_NAME));
+        Genre genre = mongoTemplate.findOne(query1, Genre.class);
+
+        expected.setTitle(EXAMPLE_BOOK_NAME);
+        expected.setAuthor(author);
+        expected.setGenre(genre);
+
+        bookRepository.save(expected);
+        Book actual = mongoTemplate.findById(expected.getId(), Book.class);
+
+        assertEquals(expected, actual);
     }
 }

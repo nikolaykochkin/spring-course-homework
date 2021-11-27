@@ -1,70 +1,60 @@
 package org.example.repository;
 
+import org.example.model.Genre;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
-@DataJpaTest
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+
+@DataMongoTest
 class GenreRepositoryTest {
-    public static final long FIRST_GENRE_ID = 1L;
-    public static final long LAST_GENRE_ID = 3L;
+    public static final String FIRST_GENRE_NAME = "Novel";
     public static final String EXAMPLE_GENRE_NAME = "Example Genre";
 
     @Autowired
     private GenreRepository genreRepository;
 
     @Autowired
-    private TestEntityManager em;
+    private MongoTemplate mongoTemplate;
 
     @Test
-    void should_FindExpectedGenre_When_FindById() {
-//        Genre expected = em.find(Genre.class, FIRST_GENRE_ID);
-//
-//        Optional<Genre> actual = genreRepository.findById(FIRST_GENRE_ID);
-//
-//        assertEquals(expected, actual.orElse(null));
+    void should_FindExpectedGenre_When_FindByName() {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("name").is(FIRST_GENRE_NAME));
+        Genre expected = mongoTemplate.findOne(query, Genre.class);
+
+        Optional<Genre> actual = genreRepository.findGenreByName(FIRST_GENRE_NAME);
+
+        assertEquals(expected, actual.orElse(null));
     }
 
     @Test
     void should_FindAllGenres_When_FindAll() {
-//        List<Genre> expected = em.getEntityManager()
-//                .createQuery("select g from Genre g", Genre.class)
-//                .getResultList();
-//
-//        List<Genre> actual = genreRepository.findAll();
-//
-//        assertIterableEquals(expected, actual);
+        List<Genre> expected = mongoTemplate.findAll(Genre.class);
+
+        List<Genre> actual = genreRepository.findAll();
+
+        assertIterableEquals(expected, actual);
     }
 
     @Test
     void should_FindNewGenre_When_SaveGenre() {
-//        Genre expected = new Genre();
-//        expected.setName(EXAMPLE_GENRE_NAME);
-//
-//        genreRepository.save(expected);
-//        em.flush();
-//        Genre actual = em.find(Genre.class, expected.getId());
-//
-//        assertEquals(expected, actual);
-    }
+        Genre expected = new Genre();
+        expected.setName(EXAMPLE_GENRE_NAME);
 
-    @Test
-    void should_ChangeGenreName_When_UpdateGenre() {
-//        Genre expected = new Genre(FIRST_GENRE_ID, EXAMPLE_GENRE_NAME);
-//
-//        genreRepository.save(expected);
-//        em.flush();
-//        Genre actual = em.find(Genre.class, FIRST_GENRE_ID);
-//
-//        assertEquals(expected.getName(), actual.getName());
-    }
+        genreRepository.save(expected);
+        Query query = new Query();
+        query.addCriteria(Criteria.where("name").is(EXAMPLE_GENRE_NAME));
+        Genre actual = mongoTemplate.findOne(query, Genre.class);
 
-    @Test
-    void should_ReturnNoGenre_When_DeleteById() {
-//        genreRepository.deleteById(LAST_GENRE_ID);
-//        em.flush();
-//        Genre genre = em.find(Genre.class, LAST_GENRE_ID);
-//        assertNull(genre);
+        assertEquals(expected, actual);
     }
 }

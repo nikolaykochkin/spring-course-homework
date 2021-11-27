@@ -1,71 +1,59 @@
 package org.example.repository;
 
+import org.example.model.Author;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
-@DataJpaTest
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+
+@DataMongoTest
 class AuthorRepositoryTest {
 
-    public static final long FIRST_AUTHOR_ID = 1L;
-    public static final long LAST_AUTHOR_ID = 4L;
+    public static final String FIRST_AUTHOR_NAME = "Leo Tolstoy";
     public static final String EXAMPLE_AUTHOR_NAME = "Example Author";
 
     @Autowired
     private AuthorRepository authorRepository;
 
     @Autowired
-    private TestEntityManager em;
+    private MongoTemplate mongoTemplate;
 
     @Test
-    void should_FindExpectedAuthor_When_FindById() {
-//        Author expected = em.find(Author.class, FIRST_AUTHOR_ID);
-//
-//        Optional<Author> actual = authorRepository.findById(FIRST_AUTHOR_ID);
-//
-//        assertEquals(expected, actual.orElse(null));
+    void should_FindExpectedAuthor_When_FindByName() {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("name").is(FIRST_AUTHOR_NAME));
+        Author expected = mongoTemplate.findOne(query, Author.class);
+
+        Optional<Author> actual = authorRepository.findAuthorByName(FIRST_AUTHOR_NAME);
+
+        assertEquals(expected, actual.orElse(null));
     }
 
     @Test
     void should_FindAllAuthors_When_FindAll() {
-//        List<Author> expected = em.getEntityManager()
-//                .createQuery("select a from Author a", Author.class)
-//                .getResultList();
-//
-//        List<Author> actual = authorRepository.findAll();
-//
-//        assertIterableEquals(expected, actual);
+        List<Author> expected = mongoTemplate.findAll(Author.class);
+
+        List<Author> actual = authorRepository.findAll();
+
+        assertIterableEquals(expected, actual);
     }
 
     @Test
     void should_FindNewAuthor_When_SaveAuthor() {
-//        Author expected = new Author();
-//        expected.setName(EXAMPLE_AUTHOR_NAME);
-//
-//        authorRepository.save(expected);
-//        em.flush();
-//        Author actual = em.find(Author.class, expected.getId());
-//
-//        assertEquals(expected, actual);
-    }
+        Author expected = new Author();
+        expected.setName(EXAMPLE_AUTHOR_NAME);
 
-    @Test
-    void should_ChangeAuthorName_When_UpdateAuthor() {
-//        Author expected = new Author(FIRST_AUTHOR_ID, EXAMPLE_AUTHOR_NAME);
-//
-//        authorRepository.save(expected);
-//        em.flush();
-//        Author actual = em.find(Author.class, FIRST_AUTHOR_ID);
-//
-//        assertEquals(expected.getName(), actual.getName());
-    }
+        authorRepository.save(expected);
+        Author actual = mongoTemplate.findById(expected.getId(), Author.class);
 
-    @Test
-    void should_ReturnNoAuthor_When_DeleteById() {
-//        authorRepository.deleteById(LAST_AUTHOR_ID);
-//        em.flush();
-//        Author author = em.find(Author.class, LAST_AUTHOR_ID);
-//        assertNull(author);
+        assertEquals(expected, actual);
     }
 }

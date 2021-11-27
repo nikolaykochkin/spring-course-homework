@@ -8,7 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -20,6 +20,6 @@ public class Comment {
     @DBRef
     private Book book;
     @CreatedDate
-    private LocalDateTime createdAt;
+    private Date createdAt;
     private String text;
 }

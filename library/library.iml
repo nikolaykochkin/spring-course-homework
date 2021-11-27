@@ -7,6 +7,7 @@
         <setting name="provider-name" value="Hibernate" />
         <datasource-mapping>
           <factory-entry name="entityManagerFactory" />
+          <factory-entry name="library" />
         </datasource-mapping>
         <naming-strategy-map />
       </configuration>
@@ -61,7 +62,6 @@
     <orderEntry type="library" name="Maven: com.fasterxml:classmate:1.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.jline:jline:3.4.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.jline:jline-terminal-jna:3.4.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: net.java.dev.jna:jna:4.2.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.jline:jline-terminal:3.4.0" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.shell:spring-shell-standard:2.0.1.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.shell:spring-shell-standard-commands:2.0.1.RELEASE" level="project" />
@@ -75,7 +75,6 @@
     <orderEntry type="library" name="Maven: org.reflections:reflections:0.10.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven:maven-artifact:3.6.1" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-utils:3.2.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.12.0" level="project" />
     <orderEntry type="library" name="Maven: io.mongock:mongock-utils:5.0.22.RC" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-configuration-processor:2.5.5" level="project" />
     <orderEntry type="library" name="Maven: io.mongock:mongodb-springdata-v3-driver:5.0.22.RC" level="project" />
@@ -92,6 +91,12 @@
     <orderEntry type="library" name="Maven: javax.inject:javax.inject:1" level="project" />
     <orderEntry type="library" name="Maven: io.mongock:mongock-api:5.0.22.RC" level="project" />
     <orderEntry type="library" name="Maven: io.mongock:mongodb-sync-v4-driver:5.0.22.RC" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: de.flapdoodle.embed:de.flapdoodle.embed.mongo:3.0.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: de.flapdoodle.embed:de.flapdoodle.embed.process:3.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.12.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apache.commons:commons-compress:1.20" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.java.dev.jna:jna:5.6.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: net.java.dev.jna:jna-platform:5.6.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-starter-test:2.5.5" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-test:2.5.5" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-test-autoconfigure:2.5.5" level="project" />

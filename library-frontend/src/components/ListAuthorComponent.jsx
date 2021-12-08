@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import { useNavigate } from 'react-router-dom'
 import AuthorService from "../services/AuthorService";
 
 class ListAuthorComponent extends Component {
@@ -7,6 +8,7 @@ class ListAuthorComponent extends Component {
         this.state = {
             authors: []
         };
+        this.addAuthor = this.addAuthor.bind(this);
     }
 
     componentDidMount() {
@@ -15,10 +17,17 @@ class ListAuthorComponent extends Component {
         })
     }
 
+    addAuthor() {
+        this.props.navigate("/add-author");
+    }
+
     render() {
         return (
             <div>
                 <h2 className="text-center"> Authors List </h2>
+                <div className="row">
+                    <button className="btn btn-primary" onClick={this.addAuthor}>Add author</button>
+                </div>
                 <div className="row">
                     <table className="table table-striped table-bordered">
                         <thead>
@@ -44,4 +53,9 @@ class ListAuthorComponent extends Component {
     }
 }
 
-export default ListAuthorComponent;
+function WithNavigate(props) {
+    let navigate = useNavigate();
+    return <ListAuthorComponent {...props} navigate={navigate}/>
+}
+
+export default WithNavigate;

@@ -1,24 +1,32 @@
 import React, {Component} from 'react';
-import {useNavigate} from "react-router-dom";
 import AuthorService from "../services/AuthorService";
+import {useNavigate, useParams} from "react-router-dom";
 
-class CreateAuthorComponent extends Component {
+class EditAuthorComponent extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
+            id: this.props.params.id,
             name: ''
         };
 
         this.changeNameHandler = this.changeNameHandler.bind(this);
-        this.saveAuthor = this.saveAuthor.bind(this);
+        this.updateAuthor = this.updateAuthor.bind(this);
     }
 
-    saveAuthor = (event) => {
+    componentDidMount() {
+        AuthorService.getAuthorById(this.state.id).then((res) => {
+            let author = res.data;
+            this.setState({name: author.name});
+        });
+    }
+
+    updateAuthor = (event) => {
         event.preventDefault();
-        let author = {name: this.state.name};
+        let author = {id: this.state.id, name: this.state.name};
         console.log("author => " + JSON.stringify(author));
-        AuthorService.createAuthor(author).then(res => {
+        AuthorService.updateAuthor(author).then(res => {
             this.props.navigate("/authors");
         });
     }
@@ -37,7 +45,7 @@ class CreateAuthorComponent extends Component {
                 <div className="container">
                     <div className="row">
                         <div className="card col-md-6 offset-md-3 offset-md-3">
-                            <h3 className="text-center">Add Author</h3>
+                            <h3 className="text-center">Edit Author</h3>
                             <div className="card-body">
                                 <form>
                                     <div className="form-group">
@@ -45,7 +53,7 @@ class CreateAuthorComponent extends Component {
                                         <input placeholder="Name" name="name" className="form-control"
                                                value={this.state.name} onChange={this.changeNameHandler}/>
                                     </div>
-                                    <button className="btn btn-success" onClick={this.saveAuthor}>Save</button>
+                                    <button className="btn btn-success" onClick={this.updateAuthor}>Save</button>
                                     <button className="btn btn-danger" onClick={this.cancel.bind(this)}
                                             style={{marginLeft: "10px"}}>Cancel
                                     </button>
@@ -59,9 +67,10 @@ class CreateAuthorComponent extends Component {
     }
 }
 
-function WithNavigate(props) {
+function WithNavigateAndParams(props) {
     let navigate = useNavigate();
-    return <CreateAuthorComponent {...props} navigate={navigate}/>
+    let params = useParams();
+    return <EditAuthorComponent {...props} navigate={navigate} params={params}/>
 }
 
-export default WithNavigate;
+export default WithNavigateAndParams;

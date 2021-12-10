@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { useNavigate } from 'react-router-dom'
+import {useNavigate} from 'react-router-dom'
 import AuthorService from "../services/AuthorService";
 
 class ListAuthorComponent extends Component {
@@ -9,6 +9,7 @@ class ListAuthorComponent extends Component {
             authors: []
         };
         this.addAuthor = this.addAuthor.bind(this);
+        this.editAuthor = this.editAuthor.bind(this);
     }
 
     componentDidMount() {
@@ -19,6 +20,10 @@ class ListAuthorComponent extends Component {
 
     addAuthor() {
         this.props.navigate("/add-author");
+    }
+
+    editAuthor(id) {
+        this.props.navigate(`/edit-author/${id}`);
     }
 
     render() {
@@ -42,6 +47,11 @@ class ListAuthorComponent extends Component {
                                 author =>
                                     <tr key={author.id}>
                                         <td>{author.name}</td>
+                                        <td>
+                                            <button onClick={() => this.editAuthor(author.id)} className="btn btn-info">
+                                                Edit
+                                            </button>
+                                        </td>
                                     </tr>
                             )
                         }

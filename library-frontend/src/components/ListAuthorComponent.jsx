@@ -19,11 +19,11 @@ class ListAuthorComponent extends Component {
     }
 
     addAuthor() {
-        this.props.navigate("/add-author");
+        this.props.navigate("/authors/new");
     }
 
     editAuthor(id) {
-        this.props.navigate(`/edit-author/${id}`);
+        this.props.navigate(`/authors/${id}`);
     }
 
     render() {

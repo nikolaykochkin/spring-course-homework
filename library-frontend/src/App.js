@@ -1,11 +1,9 @@
-import logo from './logo.svg';
 import './App.css';
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import ListAuthorComponent from "./components/ListAuthorComponent";
 import HeaderComponent from "./components/HeaderComponent";
 import FooterComponent from "./components/FooterComponent";
-import CreateAuthorComponent from "./components/CreateAuthorComponent";
-import EditAuthorComponent from "./components/EditAuthorComponent";
+import AuthorComponent from "./components/AuthorComponent";
 
 function App() {
     return (
@@ -16,8 +14,7 @@ function App() {
                     <Routes>
                         <Route path="/" exact element={<ListAuthorComponent/>}/>
                         <Route path="/authors" element={<ListAuthorComponent/>}/>
-                        <Route path="/add-author" element={<CreateAuthorComponent/>}/>
-                        <Route path="/edit-author/:id" element={<EditAuthorComponent/>}/>
+                        <Route path="/authors/:id" element={<AuthorComponent/>}/>
                     </Routes>
                 </div>
                 <FooterComponent/>

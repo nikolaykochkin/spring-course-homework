@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import AuthorService from "../services/AuthorService";
 
-class CreateAuthorComponent extends Component {
+class AuthorComponent extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
+            id: this.props.params.id,
             name: ''
         };
 
@@ -14,13 +15,28 @@ class CreateAuthorComponent extends Component {
         this.saveAuthor = this.saveAuthor.bind(this);
     }
 
+    componentDidMount() {
+        if (this.state.id !== "new") {
+            AuthorService.getAuthorById(this.state.id).then((res) => {
+                let author = res.data;
+                this.setState({name: author.name});
+            });
+        }
+    }
+
     saveAuthor = (event) => {
         event.preventDefault();
         let author = {name: this.state.name};
         console.log("author => " + JSON.stringify(author));
-        AuthorService.createAuthor(author).then(res => {
-            this.props.navigate("/authors");
-        });
+        if (this.state.id === "new") {
+            AuthorService.createAuthor(author).then(res => {
+                this.props.navigate("/authors");
+            });
+        } else {
+            AuthorService.updateAuthor(author).then(res => {
+                this.props.navigate("/authors");
+            });
+        }
     }
 
     changeNameHandler = (event) => {
@@ -31,13 +47,21 @@ class CreateAuthorComponent extends Component {
         this.props.navigate("/authors");
     }
 
+    getTitle() {
+        if (this.state.id === "new") {
+            return "Create Author";
+        } else {
+            return "Edit Author";
+        }
+    }
+
     render() {
         return (
             <div>
                 <div className="container">
                     <div className="row">
                         <div className="card col-md-6 offset-md-3 offset-md-3">
-                            <h3 className="text-center">Add Author</h3>
+                            <h3 className="text-center">{this.getTitle()}</h3>
                             <div className="card-body">
                                 <form>
                                     <div className="form-group">
@@ -59,9 +83,10 @@ class CreateAuthorComponent extends Component {
     }
 }
 
-function WithNavigate(props) {
+function WithNavigateAndParams(props) {
     let navigate = useNavigate();
-    return <CreateAuthorComponent {...props} navigate={navigate}/>
+    let params = useParams();
+    return <AuthorComponent {...props} navigate={navigate} params={params}/>
 }
 
-export default WithNavigate;
+export default WithNavigateAndParams;

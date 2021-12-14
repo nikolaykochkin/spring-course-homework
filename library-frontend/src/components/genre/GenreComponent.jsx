@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {useNavigate, useParams} from "react-router-dom";
-import AuthorService from "../services/AuthorService";
+import GenreService from "../../services/GenreService";
 
-class AuthorComponent extends Component {
+class GenreComponent extends Component {
     constructor(props) {
         super(props);
 
@@ -12,29 +12,29 @@ class AuthorComponent extends Component {
         };
 
         this.changeNameHandler = this.changeNameHandler.bind(this);
-        this.saveAuthor = this.saveAuthor.bind(this);
+        this.saveGenre = this.saveGenre.bind(this);
     }
 
     componentDidMount() {
         if (this.state.id !== "new") {
-            AuthorService.getAuthorById(this.state.id).then((res) => {
-                let author = res.data;
-                this.setState({name: author.name});
+            GenreService.getGenreById(this.state.id).then((res) => {
+                let genre = res.data;
+                this.setState({name: genre.name});
             });
         }
     }
 
-    saveAuthor = (event) => {
+    saveGenre = (event) => {
         event.preventDefault();
-        let author = {name: this.state.name};
-        console.log("author => " + JSON.stringify(author));
+        let genre = {name: this.state.name};
+        console.log("genre => " + JSON.stringify(genre));
         if (this.state.id === "new") {
-            AuthorService.createAuthor(author).then(res => {
-                this.props.navigate("/authors");
+            GenreService.createGenre(genre).then(res => {
+                this.props.navigate("/genres");
             });
         } else {
-            AuthorService.updateAuthor(author).then(res => {
-                this.props.navigate("/authors");
+            GenreService.updateGenre(genre).then(res => {
+                this.props.navigate("/genres");
             });
         }
     }
@@ -44,14 +44,14 @@ class AuthorComponent extends Component {
     }
 
     cancel() {
-        this.props.navigate("/authors");
+        this.props.navigate("/genres");
     }
 
     getTitle() {
         if (this.state.id === "new") {
-            return "Create Author";
+            return "Create Genre";
         } else {
-            return "Edit Author";
+            return "Edit Genre";
         }
     }
 
@@ -69,7 +69,7 @@ class AuthorComponent extends Component {
                                         <input placeholder="Name" name="name" className="form-control"
                                                value={this.state.name} onChange={this.changeNameHandler}/>
                                     </div>
-                                    <button className="btn btn-success" onClick={this.saveAuthor}>Save</button>
+                                    <button className="btn btn-success" onClick={this.saveGenre}>Save</button>
                                     <button className="btn btn-danger" onClick={this.cancel.bind(this)}
                                             style={{marginLeft: "10px"}}>Cancel
                                     </button>
@@ -86,7 +86,7 @@ class AuthorComponent extends Component {
 function WithNavigateAndParams(props) {
     let navigate = useNavigate();
     let params = useParams();
-    return <AuthorComponent {...props} navigate={navigate} params={params}/>
+    return <GenreComponent {...props} navigate={navigate} params={params}/>
 }
 
 export default WithNavigateAndParams;

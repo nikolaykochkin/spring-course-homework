@@ -8,7 +8,8 @@ class AuthorComponent extends Component {
 
         this.state = {
             id: this.props.params.id,
-            name: ''
+            name: '',
+            wasValidated: false
         };
 
         this.changeNameHandler = this.changeNameHandler.bind(this);
@@ -26,9 +27,13 @@ class AuthorComponent extends Component {
 
     saveAuthor = (event) => {
         event.preventDefault();
-        let author = {name: this.state.name};
+        let author = {
+            id: this.state.id,
+            name: this.state.name
+        };
         console.log("author => " + JSON.stringify(author));
         if (this.state.id === "new") {
+            author.id = null;
             AuthorService.createAuthor(author).then(res => {
                 this.props.navigate("/authors");
             });

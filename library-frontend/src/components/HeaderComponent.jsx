@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {useLocation} from "react-router-dom";
 
 class HeaderComponent extends Component {
     constructor(props) {
@@ -18,13 +19,19 @@ class HeaderComponent extends Component {
                     <div className="collapse navbar-collapse" id="navbarNav">
                         <ul className="navbar-nav">
                             <li className="nav-item">
-                                <a className="nav-link active" aria-current="page" href="/books">Books</a>
+                                {this.props.location.pathname.startsWith("/books")
+                                    ? <a className="nav-link active" aria-current="page" href="/books">Books</a>
+                                    : <a className="nav-link" href="/books">Books</a>}
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="/authors">Authors</a>
+                                {this.props.location.pathname.startsWith("/authors")
+                                    ? <a className="nav-link active" aria-current="page" href="/authors">Authors</a>
+                                    : <a className="nav-link" href="/authors">Authors</a>}
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="/genres">Genres</a>
+                                {this.props.location.pathname.startsWith("/genres")
+                                    ? <a className="nav-link active" aria-current="page" href="/genres">Genres</a>
+                                    : <a className="nav-link" href="/genres">Genres</a>}
                             </li>
                         </ul>
                     </div>
@@ -34,4 +41,9 @@ class HeaderComponent extends Component {
     }
 }
 
-export default HeaderComponent;
+function WithNavigateAndParams(props) {
+    let location = useLocation();
+    return <HeaderComponent {...props} location={location}/>
+}
+
+export default WithNavigateAndParams;

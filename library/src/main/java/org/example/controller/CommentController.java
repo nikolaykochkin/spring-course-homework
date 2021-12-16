@@ -11,10 +11,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -33,8 +35,9 @@ public class CommentController {
     }
 
     @GetMapping
-    public List<Comment> findAll() {
-        return commentRepository.findAll();
+    public List<Comment> find(@RequestParam Optional<String> bookId) {
+        return bookId.map(commentRepository::findCommentByBookId)
+                .orElseGet(commentRepository::findAll);
     }
 
     @PostMapping

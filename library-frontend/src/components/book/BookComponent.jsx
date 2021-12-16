@@ -3,6 +3,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import BookService from "../../services/BookService";
 import AuthorService from "../../services/AuthorService";
 import GenreService from "../../services/GenreService";
+import CommentService from "../../services/CommentService";
 
 class BookComponent extends Component {
     constructor(props) {
@@ -15,13 +16,17 @@ class BookComponent extends Component {
             genreId: null,
             authors: [],
             genres: [],
+            comment: '',
+            comments: [],
             wasValidated: false
         };
 
         this.changeTitleHandler = this.changeTitleHandler.bind(this);
         this.changeAuthorHandler = this.changeAuthorHandler.bind(this);
         this.changeGenreHandler = this.changeGenreHandler.bind(this);
+        this.changeCommentHandler = this.changeCommentHandler.bind(this);
         this.saveBook = this.saveBook.bind(this);
+        this.saveComment = this.saveComment.bind(this);
     }
 
     componentDidMount() {
@@ -35,6 +40,9 @@ class BookComponent extends Component {
             BookService.getBookById(this.state.id).then((res) => {
                 let book = res.data;
                 this.setState({title: book.title, authorId: book.author.id, genreId: book.genre.id});
+            });
+            CommentService.getCommentByBookId(this.state.id).then(res => {
+                this.setState({comments: res.data})
             });
         }
     }
@@ -80,6 +88,21 @@ class BookComponent extends Component {
         this.setState({genreId: event.target.value || null});
     }
 
+    changeCommentHandler = (event) => {
+        this.setState({comment: event.target.value})
+    }
+
+    saveComment = (event) => {
+        event.preventDefault();
+        if (this.state.comment === '') {
+            return;
+        }
+        let comment = {book: {id: this.state.id}, text: this.state.comment};
+        CommentService.createComment(comment).then(res => {
+            this.setState({comments: this.state.comments.concat(res.data)})
+        })
+    }
+
     cancel() {
         this.props.navigate("/books");
     }
@@ -98,9 +121,9 @@ class BookComponent extends Component {
                 <div className="container">
                     <div className="row">
                         <div className="card col-md-6 offset-md-3 offset-md-3">
-                            <h3 className="text-center">{this.getTitle()}</h3>
+                            <h3 className="text-center h3">{this.getTitle()}</h3>
                             <div className="card-body">
-                                <form className={this.state.wasValidated && "was-validated"} noValidate>
+                                <form className={this.state.wasValidated ? "was-validated" : ""} noValidate>
                                     <div className="mb-3">
                                         <label htmlFor="bookInputTitle" className="form-label">Title</label>
                                         <input type="text" className="form-control" id="bookInputTitle"
@@ -136,12 +159,40 @@ class BookComponent extends Component {
                                             Please select a genre.
                                         </div>
                                     </div>
-                                    <button className="btn btn-success" onClick={this.saveBook} type="submit">Save
-                                    </button>
-                                    <button className="btn btn-danger" onClick={this.cancel.bind(this)}
-                                            style={{marginLeft: "10px"}}>Cancel
-                                    </button>
+                                    <div className="mb-3">
+                                        <button className="btn btn-success" onClick={this.saveBook} type="submit">Save
+                                        </button>
+                                        <button className="btn btn-danger" onClick={this.cancel.bind(this)}
+                                                style={{marginLeft: "10px"}}>Cancel
+                                        </button>
+                                    </div>
                                 </form>
+                                <p>
+                                    <button className="btn btn-primary" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseExample" aria-expanded="false"
+                                            aria-controls="collapseExample">
+                                        Comments ({this.state.comments.length})
+                                    </button>
+                                </p>
+                                <div className="collapse" id="collapseExample">
+                                    {this.state.comments.map(comment =>
+                                        <div className="card mb-3">
+                                            <div className="card-body">{comment.text}</div>
+                                            <div className="card-footer text-muted text-end">
+                                                Posted: {new Date(comment.createdAt).toLocaleString()}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="input-group mb-3">
+                                        <input type="text" className="form-control" placeholder="Enter comment..."
+                                               aria-label="Comment" aria-describedby="button-addon2"
+                                               value={this.state.comment} onChange={this.changeCommentHandler}/>
+                                        <button className="btn btn-outline-secondary" type="button"
+                                                id="button-addon2" onClick={this.saveComment}>Post
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

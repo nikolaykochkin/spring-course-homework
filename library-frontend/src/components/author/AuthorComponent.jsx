@@ -27,6 +27,10 @@ class AuthorComponent extends Component {
 
     saveAuthor = (event) => {
         event.preventDefault();
+        if (this.state.name === '') {
+            this.setState({wasValidated: true})
+            return;
+        }
         let author = {
             id: this.state.id,
             name: this.state.name
@@ -68,11 +72,15 @@ class AuthorComponent extends Component {
                         <div className="card col-md-6 offset-md-3 offset-md-3">
                             <h3 className="text-center">{this.getTitle()}</h3>
                             <div className="card-body">
-                                <form>
-                                    <div className="form-group">
-                                        <label>Name:</label>
-                                        <input placeholder="Name" name="name" className="form-control"
-                                               value={this.state.name} onChange={this.changeNameHandler}/>
+                                <form className={this.state.wasValidated && "was-validated"} noValidate>
+                                    <div className="mb-3">
+                                        <label htmlFor="authorInputName" className="form-label">Name</label>
+                                        <input type="text" className="form-control" id="authorInputName"
+                                               placeholder="Name" value={this.state.name}
+                                               onChange={this.changeNameHandler} required/>
+                                        <div className="invalid-feedback">
+                                            Please provide a name.
+                                        </div>
                                     </div>
                                     <button className="btn btn-success" onClick={this.saveAuthor}>Save</button>
                                     <button className="btn btn-danger" onClick={this.cancel.bind(this)}

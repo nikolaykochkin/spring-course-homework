@@ -8,7 +8,8 @@ class GenreComponent extends Component {
 
         this.state = {
             id: this.props.params.id,
-            name: ''
+            name: '',
+            wasValidated: false
         };
 
         this.changeNameHandler = this.changeNameHandler.bind(this);
@@ -26,9 +27,14 @@ class GenreComponent extends Component {
 
     saveGenre = (event) => {
         event.preventDefault();
-        let genre = {name: this.state.name};
+        if (this.state.name === '') {
+            this.setState({wasValidated: true})
+            return;
+        }
+        let genre = {id: this.state.id, name: this.state.name};
         console.log("genre => " + JSON.stringify(genre));
         if (this.state.id === "new") {
+            genre.id = null;
             GenreService.createGenre(genre).then(res => {
                 this.props.navigate("/genres");
             });
@@ -63,11 +69,15 @@ class GenreComponent extends Component {
                         <div className="card col-md-6 offset-md-3 offset-md-3">
                             <h3 className="text-center">{this.getTitle()}</h3>
                             <div className="card-body">
-                                <form>
-                                    <div className="form-group">
-                                        <label>Name:</label>
-                                        <input placeholder="Name" name="name" className="form-control"
-                                               value={this.state.name} onChange={this.changeNameHandler}/>
+                                <form className={this.state.wasValidated && "was-validated"} noValidate>
+                                    <div className="mb-3">
+                                        <label htmlFor="authorInputName" className="form-label">Name</label>
+                                        <input type="text" className="form-control" id="authorInputName"
+                                               placeholder="Name" value={this.state.name}
+                                               onChange={this.changeNameHandler} required/>
+                                        <div className="invalid-feedback">
+                                            Please provide a name.
+                                        </div>
                                     </div>
                                     <button className="btn btn-success" onClick={this.saveGenre}>Save</button>
                                     <button className="btn btn-danger" onClick={this.cancel.bind(this)}

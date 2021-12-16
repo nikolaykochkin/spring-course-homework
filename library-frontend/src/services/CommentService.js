@@ -12,6 +12,10 @@ class CommentService {
         return axios.post(COMMENT_API_BASE_URL, comment);
     }
 
+    getCommentByBookId(bookId) {
+        return axios.get(COMMENT_API_BASE_URL, {params: {bookId: bookId}})
+    }
+
     getCommentById(commentId) {
         return axios.get(COMMENT_API_BASE_URL + "/" + commentId);
     }

@@ -19,7 +19,7 @@ class HeaderComponent extends Component {
                     <div className="collapse navbar-collapse" id="navbarNav">
                         <ul className="navbar-nav">
                             <li className="nav-item">
-                                {this.props.location.pathname.startsWith("/books")
+                                {this.props.location.pathname.startsWith("/books") || this.props.location.pathname === "/"
                                     ? <a className="nav-link active" aria-current="page" href="/books">Books</a>
                                     : <a className="nav-link" href="/books">Books</a>}
                             </li>

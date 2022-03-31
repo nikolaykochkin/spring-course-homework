@@ -2,6 +2,7 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/library
+      database: library
 mongock:
   migration-scan-package:
     - org.example.migration

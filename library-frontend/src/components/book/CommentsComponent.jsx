@@ -17,24 +17,31 @@ class CommentsComponent extends Component {
 
     componentDidMount() {
         CommentService.getCommentByBookId(this.state.bookId).then(res => {
-            this.setState({comments: res.data})
+            this.setState({comments: res.data});
         });
     }
 
     changeCommentHandler = (event) => {
-        this.setState({comment: event.target.value})
+        this.setState({comment: event.target.value});
     }
 
     saveComment = (event) => {
         event.preventDefault();
         if (this.state.comment === '') {
-            this.setState({wasValidated: true})
+            this.setState({wasValidated: true});
             return;
         }
-        let comment = {book: {id: this.state.bookId}, text: this.state.comment};
+        let comment = {
+            bookId: this.state.bookId,
+            text: this.state.comment
+        };
         CommentService.createComment(comment).then(res => {
-            this.setState({comments: this.state.comments.concat(res.data), comment: '', wasValidated: false})
-        })
+            this.setState({
+                comments: this.state.comments.concat(res.data),
+                comment: '',
+                wasValidated: false
+            });
+        });
     }
 
     render() {
@@ -49,7 +56,7 @@ class CommentsComponent extends Component {
                 </p>
                 <div className="collapse" id="collapseExample">
                     {this.state.comments.map(comment =>
-                        <div className="card mb-3">
+                        <div key={comment.id} className="card mb-3">
                             <div className="card-body">{comment.text}</div>
                             <div className="card-footer text-muted text-end">
                                 Posted: {new Date(comment.createdAt).toLocaleString()}

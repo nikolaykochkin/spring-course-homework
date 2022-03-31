@@ -7,38 +7,49 @@ import io.mongock.api.annotations.RollbackBeforeExecution;
 import io.mongock.api.annotations.RollbackExecution;
 import org.example.model.Author;
 import org.example.repository.AuthorRepository;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import reactor.core.publisher.Flux;
 
 @ChangeUnit(id = "author-initializer", order = "1", author = "mongock")
 public class AuthorInitializer {
-    private final MongoTemplate mongoTemplate;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthorInitializer.class);
+    private final ReactiveMongoTemplate template;
 
-    public AuthorInitializer(MongoTemplate mongoTemplate) {
-        this.mongoTemplate = mongoTemplate;
+    public AuthorInitializer(ReactiveMongoTemplate template) {
+        this.template = template;
     }
 
     //Note this method / annotation is Optional
     @BeforeExecution
     public void before() {
-        mongoTemplate.createCollection("authors");
+        template.createCollection("authors")
+                .block();
     }
 
     //Note this method / annotation is Optional
     @RollbackBeforeExecution
     public void rollbackBefore() {
-        mongoTemplate.dropCollection("authors");
+        template.dropCollection("authors")
+                .block();
     }
 
     @Execution
     public void migrationMethod(AuthorRepository authorRepository) {
-        authorRepository.save(new Author(null, "Leo Tolstoy"));
-        authorRepository.save(new Author(null, "Fyodor Dostoevsky"));
-        authorRepository.save(new Author(null, "William Shakespeare"));
+        Flux.just(
+                        new Author(null, "Leo Tolstoy"),
+                        new Author(null, "Fyodor Dostoevsky"),
+                        new Author(null, "William Shakespeare")
+                )
+                .flatMap(authorRepository::insert)
+                .doOnNext(author -> LOGGER.info("{} saved", author))
+                .blockLast();
     }
 
     @RollbackExecution
     public void rollback(AuthorRepository authorRepository) {
-        authorRepository.deleteAll();
+        authorRepository.deleteAll()
+                .block();
     }
-
 }

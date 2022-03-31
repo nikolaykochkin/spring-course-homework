@@ -1,12 +1,9 @@
 package org.example.repository;
 
 import org.example.model.Comment;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import reactor.core.publisher.Flux;
 
-import java.util.List;
-
-public interface CommentRepository extends MongoRepository<Comment, String> {
-    @Query(value = "{ 'book.$id' : ObjectId(?0) }")
-    List<Comment> findCommentByBookId(String bookId);
+public interface CommentRepository extends ReactiveMongoRepository<Comment, String> {
+    Flux<Comment> findCommentsByBookId(String bookId);
 }

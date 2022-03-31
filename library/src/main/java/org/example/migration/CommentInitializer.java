@@ -8,48 +8,74 @@ import io.mongock.api.annotations.RollbackExecution;
 import org.example.model.Comment;
 import org.example.repository.BookRepository;
 import org.example.repository.CommentRepository;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import reactor.core.publisher.Flux;
+
+import java.util.List;
 
 @ChangeUnit(id = "comment-initializer", order = "4", author = "mongock")
 public class CommentInitializer {
-    private final MongoTemplate mongoTemplate;
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookInitializer.class);
+    private final ReactiveMongoTemplate template;
 
-    public CommentInitializer(MongoTemplate mongoTemplate) {
-        this.mongoTemplate = mongoTemplate;
+    public CommentInitializer(ReactiveMongoTemplate template) {
+        this.template = template;
     }
 
     //Note this method / annotation is Optional
     @BeforeExecution
     public void before() {
-        mongoTemplate.createCollection("comments");
+        template.createCollection("comments")
+                .block();
     }
 
     //Note this method / annotation is Optional
     @RollbackBeforeExecution
     public void rollbackBefore() {
-        mongoTemplate.dropCollection("comments");
+        template.dropCollection("comments")
+                .block();
     }
 
     @Execution
     public void migrationMethod(CommentRepository repository, BookRepository bookRepository) {
-        Comment comment1 = new Comment();
-        comment1.setBook(bookRepository.findBookByTitle("War and Peace").orElse(null));
-        comment1.setText("Too long(");
-        repository.save(comment1);
-
-        Comment comment2 = new Comment();
-        comment2.setBook(bookRepository.findBookByTitle("Crime and Punishment").orElse(null));
-        comment2.setText("Creepy");
-        repository.save(comment2);
-
-        Comment comment3 = new Comment();
-        comment3.setBook(bookRepository.findBookByTitle("Crime and Punishment").orElse(null));
-        comment3.setText("Amazing");
-        repository.save(comment3);
+        Flux.fromIterable(getComments())
+                .doOnNext(comment -> LOGGER.info("{} 1", comment))
+                .flatMap(comment -> bookRepository.findBookByTitle(comment.getBookId())
+                        .doOnNext(book -> comment.setBookId(book.getId()))
+                        .map(book -> comment))
+                .doOnNext(comment -> LOGGER.info("{} 2", comment))
+                .flatMap(repository::insert)
+                .doOnNext(comment -> LOGGER.info("{} saved", comment))
+                .blockLast();
     }
 
     @RollbackExecution
     public void rollback(CommentRepository repository) {
-        repository.deleteAll();
+        repository.deleteAll().block();
+    }
+
+    private List<Comment> getComments() {
+        return List.of(
+                new Comment(
+                        null,
+                        "War and Peace",
+                        null,
+                        "Too long("
+                ),
+                new Comment(
+                        null,
+                        "Crime and Punishment",
+                        null,
+                        "Creepy"
+                ),
+                new Comment(
+                        null,
+                        "Crime and Punishment",
+                        null,
+                        "Amazing"
+                )
+        );
     }
 }

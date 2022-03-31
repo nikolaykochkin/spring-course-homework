@@ -5,9 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
@@ -17,9 +18,10 @@ import java.util.Date;
 public class Comment {
     @Id
     private String id;
-    @DBRef
-    private Book book;
+    @NotNull
+    private String bookId;
     @CreatedDate
     private Date createdAt;
+    @NotBlank
     private String text;
 }

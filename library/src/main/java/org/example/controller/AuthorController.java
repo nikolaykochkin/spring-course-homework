@@ -1,8 +1,8 @@
 package org.example.controller;
 
 import org.example.model.Author;
-import org.example.repository.AuthorRepository;
-import org.springframework.http.HttpStatus;
+import org.example.service.AuthorService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,44 +12,47 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
+import javax.validation.Valid;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/authors")
 public class AuthorController {
-    private final AuthorRepository authorRepository;
+    private final AuthorService authorService;
 
-    public AuthorController(AuthorRepository authorRepository) {
-        this.authorRepository = authorRepository;
+    public AuthorController(AuthorService authorService) {
+        this.authorService = authorService;
     }
 
     @GetMapping("/{id}")
-    public Author getAuthorById(@PathVariable("id") String id) {
-        return authorRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public Mono<ResponseEntity<Author>> getAuthorById(@PathVariable("id") String id) {
+        return authorService.getAuthorById(id)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @GetMapping
-    public List<Author> findAll() {
-        return authorRepository.findAll();
+    public Flux<Author> findAll() {
+        return authorService.findAll();
     }
 
     @PostMapping
-    public Author save(@RequestBody Author author) {
-        return authorRepository.save(author);
+    public Mono<Author> save(@Valid @RequestBody Mono<Author> author) {
+        return authorService.save(author);
     }
 
     @PutMapping("/{id}")
-    public Author update(@RequestBody Author author, @PathVariable("id") String id) {
-        author.setId(id);
-        return authorRepository.save(author);
+    public Mono<ResponseEntity<Author>> update(@Valid @RequestBody Mono<Author> author, @PathVariable("id") String id) {
+        return authorService.update(author, id)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") String id) {
-        authorRepository.deleteById(id);
+    public Mono<Void> delete(@PathVariable("id") String id) {
+        return authorService.delete(id);
     }
 }

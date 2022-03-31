@@ -3,7 +3,6 @@ import {useNavigate, useParams} from "react-router-dom";
 import BookService from "../../services/BookService";
 import AuthorService from "../../services/AuthorService";
 import GenreService from "../../services/GenreService";
-import CommentService from "../../services/CommentService";
 import CommentsComponent from "./CommentsComponent";
 
 class BookComponent extends Component {
@@ -49,13 +48,11 @@ class BookComponent extends Component {
             this.setState({wasValidated: true})
             return;
         }
-        let author = this.state.authors.find(a => a.id === this.state.authorId);
-        let genre = this.state.genres.find(g => g.id === this.state.genreId);
         let book = {
             id: this.state.id,
             title: this.state.title,
-            author: author,
-            genre: genre
+            authorId: this.state.authorId,
+            genreId: this.state.genreId
         };
         console.log("book => " + JSON.stringify(book));
         if (this.state.id === "new") {
@@ -119,7 +116,7 @@ class BookComponent extends Component {
                                                 value={this.state.authorId || ''} required>
                                             <option value={''} disabled>Choose author...</option>
                                             {this.state.authors.map(a =>
-                                                <option value={a.id}>{a.name}</option>)}
+                                                <option key={a.id} value={a.id}>{a.name}</option>)}
                                         </select>
                                         <div className="invalid-feedback">
                                             Please select an author.
@@ -132,7 +129,7 @@ class BookComponent extends Component {
                                                 value={this.state.genreId || ''} required>
                                             <option value={''} disabled>Choose genre...</option>
                                             {this.state.genres.map(g =>
-                                                <option value={g.id}>{g.name}</option>)}
+                                                <option key={g.id} value={g.id}>{g.name}</option>)}
                                         </select>
                                         <div className="invalid-feedback">
                                             Please select a genre.

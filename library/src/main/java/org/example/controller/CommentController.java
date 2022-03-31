@@ -1,8 +1,8 @@
 package org.example.controller;
 
 import org.example.model.Comment;
-import org.example.repository.CommentRepository;
-import org.springframework.http.HttpStatus;
+import org.example.service.CommentService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,46 +13,49 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
+import javax.validation.Valid;
 import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/comments")
 public class CommentController {
-    private final CommentRepository commentRepository;
+    private final CommentService commentService;
 
-    public CommentController(CommentRepository commentRepository) {
-        this.commentRepository = commentRepository;
+    public CommentController(CommentService commentService) {
+        this.commentService = commentService;
     }
 
     @GetMapping("/{id}")
-    public Comment getCommentById(@PathVariable("id") String id) {
-        return commentRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public Mono<ResponseEntity<Comment>> getCommentById(@PathVariable("id") String id) {
+        return commentService.getCommentById(id)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @GetMapping
-    public List<Comment> find(@RequestParam Optional<String> bookId) {
-        return bookId.map(commentRepository::findCommentByBookId)
-                .orElseGet(commentRepository::findAll);
+    public Flux<Comment> find(@RequestParam Optional<String> bookId) {
+        return bookId.map(commentService::findByBookId)
+                .orElseGet(commentService::findAll);
     }
 
     @PostMapping
-    public Comment save(@RequestBody Comment comment) {
-        return commentRepository.save(comment);
+    public Mono<Comment> save(@Valid @RequestBody Mono<Comment> comment) {
+        return commentService.save(comment);
     }
 
     @PutMapping("/{id}")
-    public Comment update(@RequestBody Comment comment, @PathVariable("id") String id) {
-        comment.setId(id);
-        return commentRepository.save(comment);
+    public Mono<ResponseEntity<Comment>> update(@Valid @RequestBody Mono<Comment> comment, @PathVariable("id") String id) {
+        return commentService.update(comment, id)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") String id) {
-        commentRepository.deleteById(id);
+    public Mono<Void> delete(@PathVariable("id") String id) {
+        return commentService.delete(id);
     }
 }

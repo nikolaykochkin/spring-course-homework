@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.bson.types.ObjectId;
 import org.example.model.Author;
 import org.example.repository.AuthorRepository;
 import org.springframework.stereotype.Service;
@@ -15,22 +16,24 @@ public class AuthorService {
     }
 
     public Mono<Author> getAuthorById(String id) {
-        return authorRepository.findById(id);
+        return Mono.just(id)
+                .filter(ObjectId::isValid)
+                .flatMap(authorRepository::findById);
     }
 
     public Flux<Author> findAll() {
         return authorRepository.findAll();
     }
 
-    public Mono<Author> save(Mono<Author> author) {
-        return author.flatMap(authorRepository::insert);
+    public Mono<Author> save(Mono<Author> authorMono) {
+        return authorMono.flatMap(authorRepository::insert);
     }
 
-    public Mono<Author> update(Mono<Author> author, String id) {
-        return author
-                .flatMap(a -> authorRepository.findById(id)
-                        .map(author1 -> a))
-                .doOnNext(a -> a.setId(id))
+    public Mono<Author> update(Mono<Author> authorMono, String id) {
+        return authorMono
+                .filter(author -> ObjectId.isValid(id))
+                .filterWhen(author -> authorRepository.existsById(id))
+                .doOnNext(author -> author.setId(id))
                 .flatMap(authorRepository::save);
     }
 

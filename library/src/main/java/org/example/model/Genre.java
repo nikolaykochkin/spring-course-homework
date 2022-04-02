@@ -15,6 +15,6 @@ import javax.validation.constraints.NotBlank;
 public class Genre {
     @Id
     private String id;
-    @NotBlank
+    @NotBlank(message = "Genre name should be not blank")
     private String name;
 }

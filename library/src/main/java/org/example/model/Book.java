@@ -16,10 +16,10 @@ import javax.validation.constraints.NotNull;
 public class Book {
     @Id
     private String id;
-    @NotBlank
+    @NotBlank(message = "Book title should not be blank")
     private String title;
-    @NotNull
+    @NotNull(message = "Book authorId should not be null")
     private String authorId;
-    @NotNull
+    @NotNull(message = "Book genreId should not be null")
     private String genreId;
 }

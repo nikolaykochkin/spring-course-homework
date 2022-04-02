@@ -1,6 +1,8 @@
 package org.example.service;
 
+import org.bson.types.ObjectId;
 import org.example.dto.BookResponseDto;
+import org.example.exception.RelatedNotFoundException;
 import org.example.model.Book;
 import org.example.repository.AuthorRepository;
 import org.example.repository.BookRepository;
@@ -31,8 +33,9 @@ public class BookService {
     }
 
     public Mono<BookResponseDto> findById(String id) {
-        return bookRepository
-                .findByIdQueryDto(id)
+        return Mono.just(id)
+                .filter(ObjectId::isValid)
+                .flatMap(bookRepository::findByIdQueryDto)
                 .map(ModelDtoUtil::bookQueryToResponseDto);
     }
 
@@ -52,6 +55,7 @@ public class BookService {
 
     public Mono<BookResponseDto> update(Mono<Book> bookMono, String id) {
         return bookMono
+                .filter(book -> ObjectId.isValid(id))
                 .doOnNext(book -> book.setId(id))
                 .filterWhen(book -> bookRepository.existsById(id))
                 .transform(getRelated())
@@ -69,7 +73,7 @@ public class BookService {
                 .flatMap(book -> Mono.just(book)
                         .zipWith(
                                 authorRepository.findById(book.getAuthor().getId())
-                                        .switchIfEmpty(Mono.error(new RuntimeException("Author not found"))),
+                                        .switchIfEmpty(Mono.error(new RelatedNotFoundException("Author not found"))),
                                 (b, a) -> {
                                     b.setAuthor(a);
                                     return b;
@@ -77,7 +81,7 @@ public class BookService {
                 .flatMap(book -> Mono.just(book)
                         .zipWith(
                                 genreRepository.findById(book.getGenre().getId())
-                                        .switchIfEmpty(Mono.error(new RuntimeException("Genre not found"))),
+                                        .switchIfEmpty(Mono.error(new RelatedNotFoundException("Genre not found"))),
                                 (b, g) -> {
                                     b.setGenre(g);
                                     return b;

@@ -15,6 +15,6 @@ import javax.validation.constraints.NotBlank;
 public class Author {
     @Id
     private String id;
-    @NotBlank
+    @NotBlank(message = "Author name should not be blank")
     private String name;
 }

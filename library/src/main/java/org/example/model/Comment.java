@@ -18,10 +18,10 @@ import java.util.Date;
 public class Comment {
     @Id
     private String id;
-    @NotNull
+    @NotNull(message = "Comment bookId should not be null")
     private String bookId;
     @CreatedDate
     private Date createdAt;
-    @NotBlank
+    @NotBlank(message = "Comment text should not be blank")
     private String text;
 }

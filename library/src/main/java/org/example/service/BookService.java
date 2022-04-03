@@ -6,9 +6,11 @@ import org.example.exception.RelatedNotFoundException;
 import org.example.model.Book;
 import org.example.repository.AuthorRepository;
 import org.example.repository.BookRepository;
+import org.example.repository.CommentRepository;
 import org.example.repository.GenreRepository;
 import org.example.util.ModelDtoUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -19,11 +21,16 @@ public class BookService {
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
     private final GenreRepository genreRepository;
+    private final CommentRepository commentRepository;
 
-    public BookService(BookRepository bookRepository, AuthorRepository authorRepository, GenreRepository genreRepository) {
+    public BookService(BookRepository bookRepository,
+                       AuthorRepository authorRepository,
+                       GenreRepository genreRepository,
+                       CommentRepository commentRepository) {
         this.bookRepository = bookRepository;
         this.authorRepository = authorRepository;
         this.genreRepository = genreRepository;
+        this.commentRepository = commentRepository;
     }
 
     public Flux<BookResponseDto> getAll() {
@@ -32,14 +39,14 @@ public class BookService {
                 .map(ModelDtoUtil::bookQueryToResponseDto);
     }
 
-    public Mono<BookResponseDto> findById(String id) {
+    public Mono<BookResponseDto> getById(String id) {
         return Mono.just(id)
                 .filter(ObjectId::isValid)
                 .flatMap(bookRepository::findByIdQueryDto)
                 .map(ModelDtoUtil::bookQueryToResponseDto);
     }
 
-    public Mono<BookResponseDto> insert(Mono<Book> bookMono) {
+    public Mono<BookResponseDto> create(Mono<Book> bookMono) {
         return bookMono
                 .transform(getRelated())
                 .flatMap(book -> Mono.just(book)
@@ -63,8 +70,11 @@ public class BookService {
                         .map(b -> book));
     }
 
+    @Transactional
     public Mono<Void> delete(String id) {
-        return bookRepository.deleteById(id);
+        return bookRepository.findById(id)
+                .flatMap(book -> commentRepository.deleteAll(commentRepository.findCommentsByBookId(book.getId())))
+                .then(bookRepository.deleteById(id));
     }
 
     private Function<Mono<Book>, Mono<BookResponseDto>> getRelated() {

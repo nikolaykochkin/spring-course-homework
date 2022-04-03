@@ -21,11 +21,11 @@ public class AuthorService {
                 .flatMap(authorRepository::findById);
     }
 
-    public Flux<Author> findAll() {
+    public Flux<Author> getAll() {
         return authorRepository.findAll();
     }
 
-    public Mono<Author> save(Mono<Author> authorMono) {
+    public Mono<Author> create(Mono<Author> authorMono) {
         return authorMono.flatMap(authorRepository::insert);
     }
 

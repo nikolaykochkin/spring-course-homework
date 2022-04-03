@@ -21,11 +21,11 @@ public class GenreService {
                 .flatMap(genreRepository::findById);
     }
 
-    public Flux<Genre> findAll() {
+    public Flux<Genre> getAll() {
         return genreRepository.findAll();
     }
 
-    public Mono<Genre> save(Mono<Genre> genreMono) {
+    public Mono<Genre> create(Mono<Genre> genreMono) {
         return genreMono.flatMap(genreRepository::insert);
     }
 

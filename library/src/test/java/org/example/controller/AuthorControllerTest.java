@@ -3,13 +3,11 @@ package org.example.controller;
 import org.example.repository.AuthorRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(AuthorController.class)
-@TestPropertySource("classpath:disable_mongo.properties")
+//@WebMvcTest(AuthorController.class)
+//@TestPropertySource("classpath:disable_mongo.properties")
 public class AuthorControllerTest {
     public static final String AUTHOR_NAME = "Leo Tolstoy";
     public static final String AUTHOR_ID = "AUTHOR_ID";

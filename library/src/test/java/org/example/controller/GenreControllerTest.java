@@ -3,13 +3,11 @@ package org.example.controller;
 import org.example.repository.GenreRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(GenreController.class)
-@TestPropertySource("classpath:disable_mongo.properties")
+//@WebMvcTest(GenreController.class)
+//@TestPropertySource("classpath:disable_mongo.properties")
 public class GenreControllerTest {
     public static final String GENRE_NAME = "Novel";
     public static final String GENRE_ID = "GENRE_ID";

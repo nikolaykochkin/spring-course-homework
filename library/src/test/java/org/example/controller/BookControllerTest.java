@@ -4,13 +4,11 @@ import org.example.model.Book;
 import org.example.repository.BookRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(BookController.class)
-@TestPropertySource("classpath:disable_mongo.properties")
+//@WebMvcTest(BookController.class)
+//@TestPropertySource("classpath:disable_mongo.properties")
 public class BookControllerTest {
     public static final String BOOK_TITLE = "War and Peace";
     public static final String BOOK_ID = "BOOK_ID";

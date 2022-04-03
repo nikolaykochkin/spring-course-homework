@@ -27,17 +27,17 @@ public class CommentService {
                 .flatMap(commentRepository::findById);
     }
 
-    public Flux<Comment> findByBookId(String bookId) {
+    public Flux<Comment> getByBookId(String bookId) {
         return Flux.just(bookId)
                 .filter(ObjectId::isValid)
                 .flatMap(commentRepository::findCommentsByBookId);
     }
 
-    public Flux<Comment> findAll() {
+    public Flux<Comment> getAll() {
         return commentRepository.findAll();
     }
 
-    public Mono<Comment> save(Mono<Comment> commentMono) {
+    public Mono<Comment> create(Mono<Comment> commentMono) {
         return commentMono
                 .transform(checkBook())
                 .flatMap(commentRepository::insert);

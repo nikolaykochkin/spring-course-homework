@@ -5,13 +5,11 @@ import org.example.model.Comment;
 import org.example.repository.CommentRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(CommentController.class)
-@TestPropertySource("classpath:disable_mongo.properties")
+//@WebMvcTest(CommentController.class)
+//@TestPropertySource("classpath:disable_mongo.properties")
 public class CommentControllerTest {
     public static final String COMMENT_TEXT = "Example Comment";
     public static final String COMMENT_ID = "COMMENT_ID";
